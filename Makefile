@@ -1,4 +1,4 @@
-DOCKER_COMPOSE=docker compose -f docker-compose.yml
+DOCKER_COMPOSE=docker-compose -f docker-compose.yml
 BUNDLE_FLAGS=
 CERTIFICATE_PATH=smoke_test_certificates
 

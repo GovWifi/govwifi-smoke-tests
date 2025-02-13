@@ -8,7 +8,7 @@ feature "Sponsor Journey" do
 
   before :context do
     @signup_address = "sponsor@#{ENV['SUBDOMAIN']}.service.gov.uk"
-    @notify_address = "#{ENV['NOTIFY_FIELD']}@notifications.service.gov.uk"
+    @notify_address = "#{ENV["NOTIFY_FIELD"]}@notifications.service.gov.uk"
     @sponsored_email_address = from_address.sub "@", "+sponsored@"
     @sponsor_email_address = from_address
     @sponsored_sms_number = ENV["SMOKETEST_PHONE_NUMBER"]
