@@ -20,7 +20,7 @@ end
 
 Capybara.configure do |config|
   config.run_server = false
-  config.default_driver = :selenium_headless
+  config.default_driver = :selenium_chrome_headless
 end
-
+Capybara.current_driver = :selenium_chrome_headless
 Capybara.app_host = "http://admin.#{ENV['SUBDOMAIN']}.service.gov.uk"

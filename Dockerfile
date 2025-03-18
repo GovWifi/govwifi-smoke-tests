@@ -8,9 +8,9 @@ ENV \
 WORKDIR /usr/src/app
 
 RUN apk add --no-cache --virtual .build-deps build-base && \
-  apk add --no-cache openssl wpa_supplicant libc6-compat firefox
+  apk add --no-cache openssl wpa_supplicant libc6-compat chromium-chromedriver
 
-RUN wget -qO - https://github.com/mozilla/geckodriver/releases/download/v0.36.0/geckodriver-v0.36.0-linux32.tar.gz \
+RUN wget -qO - https://github.com/mozilla/geckodriver/releases/download/v0.36.0/geckodriver-v0.35ß.0-linux32.tar.gz \
   | tar -zxC /usr/bin
 
 COPY Gemfile Gemfile.lock .ruby-version ./
