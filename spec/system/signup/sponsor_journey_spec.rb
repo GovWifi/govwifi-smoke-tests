@@ -41,7 +41,6 @@ feature "Sponsor Journey" do
       fill_in "Username, email address or phone number", with: @sponsored_sms_number
       click_button "Find user details"
       expect(page).to have_content("Nothing found")
-      logout
     end
     it "has set the 'read' flag on all relevant emails" do
       expect(read_email(query: @sponsored_query)).to be_nil

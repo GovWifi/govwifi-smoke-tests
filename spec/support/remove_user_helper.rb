@@ -10,6 +10,5 @@ module RemoveUserHelper
       click_link "Remove user"
       click_button "Remove user"
     end
-    logout
   end
 end

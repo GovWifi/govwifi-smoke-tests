@@ -18,7 +18,6 @@ feature "Email Journey" do
     fill_in "Username, email address or phone number", with: from_address
     click_button "Find user details"
     expect(page).to have_content("Nothing found")
-    logout
   end
   it "signs up successfully" do
     query = "from:#{notify_address} subject:Welcome is:unread to:#{from_address}"
