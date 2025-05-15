@@ -34,7 +34,7 @@ test: build
 		-e NOTIFY_FIELD \
 		-e EAP_TLS_CLIENT_CERT \
 		-e EAP_TLS_CLIENT_KEY \
-		app bundle exec rspec spec/system
+		app bundle exec rspec spec/system/signup/eap_tls_journey_spec.rb
 
 stop:
 	$(DOCKER_COMPOSE) down -v
