@@ -90,6 +90,11 @@ Instructions for updating the [Google API token](https://github.com/alphagov/gov
 
 The smoke tests have now been migrated from Concourse to AWS. [Full instructions on how to run and edit the infrastructure around them can be found here](https://docs.google.com/document/d/1RHNkGxJLr4BPPUlFgqDzCF6mSOXK0Kj2Yfb-GHXXNIA/). You will need to be a member of the GovWifi Team in order to access this guide.
 
+## Adding elastic-ips to GovWifi Admin
+- From AWS environment, get `EC2 > Elastic IP Addresses` filtered by 'smoke'
+- Fetch IP addresses from the column 'Allocated IPv4 address' 
+- Add IP addresses to GovWifi Admin (https://admin.SUBDOMAIN.service.gov.uk/ips)
+
 ## New Environments
 If creating smoke tests on new environments, ensure to create new secrets for all appropriate fields, also new templates in Notify will need creating, as well as API keys.  For Radius ensure that it knows about the ```task``` ip's as well as the smoke test org ip's ```<env>.wifi-smoke-tests-x```, these will need to be entered into the Admin App for the Smoke Test Org.
 
