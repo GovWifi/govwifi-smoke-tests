@@ -23,7 +23,14 @@ module NotifySms
   end
 
   def parse_sms_message(message:)
+    puts "MESSAGE"
+    puts message
+    puts "END"
     match = /Username:[\n\r\s]*(?<username>[a-z]{6})[\n\r\s]*Password:[\n\r\s]*(?<password>(?:[A-Z][a-z]+){3})/.match(message)
+    puts "USERNAME: "
+    puts match[:username]
+    puts "PASSWORD"
+    puts match[:password]
     [match[:username], match[:password]]
   end
 
