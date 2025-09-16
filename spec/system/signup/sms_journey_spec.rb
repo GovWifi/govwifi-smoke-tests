@@ -1,7 +1,7 @@
 require "notifications/client"
 require_relative "../../../lib/notify_sms"
 
-feature "SMS Journey" do
+feature "SMS Journey", if: ENV["ENVIRONMENT"]!="production" do
   include NotifySms
   before :each do
     remove_user(user: ENV["SMOKETEST_PHONE_NUMBER"])
