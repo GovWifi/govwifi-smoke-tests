@@ -34,6 +34,7 @@ test: build
 		-e NOTIFY_FIELD \
 		-e EAP_TLS_CLIENT_CERT \
 		-e EAP_TLS_CLIENT_KEY \
+		-e ENVIRONMENT \
 		app bundle exec rspec spec/system
 
 stop:
