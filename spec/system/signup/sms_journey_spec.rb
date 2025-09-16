@@ -1,7 +1,8 @@
 require "notifications/client"
 require_relative "../../../lib/notify_sms"
 
-feature "SMS Journey", if: ENV["ENVIRONMENT"]!="production" do
+# Don't run this test in production as it creates false red flags due to Notify slow responses
+feature "SMS Journey", if: ENV["ENVIRONMENT"] != "production" do
   include NotifySms
   before :each do
     remove_user(user: ENV["SMOKETEST_PHONE_NUMBER"])
