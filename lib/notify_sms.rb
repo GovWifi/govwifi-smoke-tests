@@ -35,7 +35,7 @@ module NotifySms
     messages = Services.notify.get_received_texts.collection
     messages.find do |message|
       message.user_number == normalised_phone_number &&
-      message.content.include?(target_text)
+        message.content.include?(target_text)
     end
   end
 
