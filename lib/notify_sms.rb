@@ -31,8 +31,6 @@ module NotifySms
     end
   end
 
-  ## This helper method is used to get the first SMS received from a given phone number.
-  ## however, it does not filter based on content.
   def get_first_sms(phone_number:)
     Services.notify.get_received_texts.collection.find { |message| message.user_number == normalise(phone_number:) }
   end
