@@ -18,6 +18,7 @@ module NotifySms
         loop do
           result = get_signup_sms(phone_number: normalised_phone_number)
           break if result && result.id != after_id
+
           print "."
           sleep interval
         end
@@ -49,7 +50,7 @@ module NotifySms
 
       begin
         # parse_sms_message raises when it doesn't match; rescue and treat as non-match
-        !!parse_sms_message(message: message.content)
+        !parse_sms_message(message: message.content).nil?
       rescue StandardError
         false
       end
