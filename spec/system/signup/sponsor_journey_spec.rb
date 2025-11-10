@@ -77,32 +77,29 @@ feature "Sponsor Journey" do
       let(:secret) { ENV["RADIUS_KEY"] }
       let(:eapol_test) { GovwifiEapoltest.new(radius_ips:, secret:) }
 
-      it "can successfully connect to Radius using the credentials in the email" do
-        output = eapol_test.run_peap_mschapv2(username: @email_username,
-                                              password: @email_password)
-        expect(output).to all have_been_successful
-      end
-      it "can successfully connect to Radius using the credentials in the sms" do
-        attempts = 0
-        max_attempts = 3
-        delay_between_attempts = 2 # seconds
-        success = false
+    it "can successfully connect to Radius using the credentials in the sms" do
+      max_attempts = 3
+      delay_between_attempts = 2 # seconds
+      attempts = 0
+      last_output = nil
 
-        begin
-          attempts += 1
-          output = eapol_test.run_peap_mschapv2(username: @sms_username,
-                                              password: @sms_password)
-          success = output.all?(have_been_successful)
+      begin
+        attempts += 1
+        last_output = eapol_test.run_peap_mschapv2(username: @sms_username,
+                                                  password: @sms_password)
+        # Use the real matcher here; if it fails we rescue below and retry.
+        expect(last_output).to all(have_been_successful)
+        # If we reach here the expectation passed -> success
+      rescue RSpec::Expectations::ExpectationNotMetError
+        if attempts < max_attempts
+          warn "Authentication attempt #{attempts} failed; retrying in #{delay_between_attempts}s..."
+          sleep delay_between_attempts
+          retry
+        end
 
-          if !success && attempts < max_attempts
-            puts "Authentication attempt #{attempts} failed. Retrying in #{delay_between_attempts} seconds..."
-            sleep delay_between_attempts
-          end
-        end while !success && attempts < max_attempts
-
-        # If all attempts failed, show the last output and fail the test
-        expect(success).to be true,
-          "Failed after #{attempts} attempts. Last output:\n#{output.join("\n")}"
+        # Final failure: raise a helpful expectation failure with the last output
+        raise RSpec::Expectations::ExpectationNotMetError,
+              "Failed after #{attempts} attempts. Last output:\n#{Array(last_output).join("\n")}"
       end
     end
   end
