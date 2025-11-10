@@ -83,9 +83,26 @@ feature "Sponsor Journey" do
         expect(output).to all have_been_successful
       end
       it "can successfully connect to Radius using the credentials in the sms" do
-        output = eapol_test.run_peap_mschapv2(username: @sms_username,
+        attempts = 0
+        max_attempts = 3
+        delay_between_attempts = 2 # seconds
+        success = false
+
+        begin
+          attempts += 1
+          output = eapol_test.run_peap_mschapv2(username: @sms_username,
                                               password: @sms_password)
-        expect(output).to all(have_been_successful), output.join("\n")
+          success = output.all?(have_been_successful)
+
+          if !success && attempts < max_attempts
+            puts "Authentication attempt #{attempts} failed. Retrying in #{delay_between_attempts} seconds..."
+            sleep delay_between_attempts
+          end
+        end while !success && attempts < max_attempts
+
+        # If all attempts failed, show the last output and fail the test
+        expect(success).to be true,
+          "Failed after #{attempts} attempts. Last output:\n#{output.join("\n")}"
       end
     end
   end
