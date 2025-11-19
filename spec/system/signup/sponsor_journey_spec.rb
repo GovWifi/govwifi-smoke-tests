@@ -56,17 +56,17 @@ feature "Sponsor Journey" do
       @email_message = fetch_reply(query: @sponsored_query)
       @sponsor_email_message = fetch_reply(query: @sponsor_query)
       @sms_message = read_reply_sms(phone_number: @govwifi_sms_number, after_id: first_sms_message_id)
-
+      sleep 5 # wait for any delayed processing
       @sms_username, @sms_password = parse_sms_message(message: @sms_message)
       @email_username, @email_password = parse_email_message(message: @email_message)
-    end
-    it "sets the sms username and password" do
-      expect(@sms_username).to_not be_nil
-      expect(@sms_password).to_not be_nil
     end
     it "sets the email username and password" do
       expect(@email_username).to_not be_nil
       expect(@email_password).to_not be_nil
+    end
+    it "sets the sms username and password" do
+      expect(@sms_username).to_not be_nil
+      expect(@sms_password).to_not be_nil
     end
     it "includes the all sponsored users in the receipt email" do
       expect(@sponsor_email_message.payload.parts.first.body.data).to include(@sponsored_email_address)
