@@ -56,4 +56,4 @@ certs:
 	openssl x509 -req -CA $(CERTIFICATE_PATH)/$(INTERMEDIATE).pem -CAkey $(CERTIFICATE_PATH)/$(INTERMEDIATE).key -in $(CERTIFICATE_PATH)/$(CLIENT).req -out $(CERTIFICATE_PATH)/$(CLIENT).pem -extensions v3_client -days $(VALID_FOR) -CAcreateserial -extfile openssl.conf -CAserial $(CERTIFICATE_PATH)/client.srl
 	rm -f $(CERTIFICATE_PATH)/*.req
 
-.PHONY: build stop test test-local test-ecr shell
+.PHONY: build stop test shell
