@@ -6,7 +6,6 @@ ROOT=smoke_test_root_ca
 INTERMEDIATE=smoke_test_intermediate_ca
 CLIENT=smoke_test_client
 VALID_FOR=9000
-TEST_CMD=app bundle exec rspec spec/system
 
 TEST_ENV_VARS = \
     -e DOCKER=docker \
@@ -37,7 +36,7 @@ lint: build
 	$(DOCKER_COMPOSE) run --rm app bundle exec rubocop
 
 test: build
-	$(DOCKER_COMPOSE)  run --rm $(TEST_ENV_VARS) $(TEST_CMD)
+	$(DOCKER_COMPOSE)  run --rm $(TEST_ENV_VARS) app bundle exec rspec spec/system
 
 stop:
 	$(DOCKER_COMPOSE) down -v
