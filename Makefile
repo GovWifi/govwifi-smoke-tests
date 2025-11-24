@@ -7,6 +7,28 @@ INTERMEDIATE=smoke_test_intermediate_ca
 CLIENT=smoke_test_client
 VALID_FOR=9000
 
+TEST_ENV_VARS = \
+    -e DOCKER=docker \
+    -e GW_SUPER_ADMIN_USER \
+    -e GW_SUPER_ADMIN_PASS \
+    -e GW_SUPER_ADMIN_2FA_SECRET \
+    -e GW_USER \
+    -e GW_PASS \
+    -e GW_2FA_SECRET \
+    -e GOOGLE_API_CREDENTIALS \
+    -e GOOGLE_API_TOKEN_DATA \
+    -e RADIUS_KEY \
+    -e RADIUS_IPS \
+    -e SUBDOMAIN \
+    -e NOTIFY_SMOKETEST_API_KEY \
+    -e NOTIFY_GO_TEMPLATE_ID \
+    -e GOVWIFI_PHONE_NUMBER \
+    -e SMOKETEST_PHONE_NUMBER \
+    -e NOTIFY_FIELD \
+    -e EAP_TLS_CLIENT_CERT \
+    -e EAP_TLS_CLIENT_KEY \
+    -e ENVIRONMENT
+
 build:
 	$(DOCKER_COMPOSE) build
 
@@ -14,54 +36,13 @@ lint: build
 	$(DOCKER_COMPOSE) run --rm app bundle exec rubocop
 
 test: build
-	$(DOCKER_COMPOSE) run --rm \
-		-e DOCKER=docker \
-		-e GW_SUPER_ADMIN_USER \
-		-e GW_SUPER_ADMIN_PASS \
-		-e GW_SUPER_ADMIN_2FA_SECRET \
-		-e GW_USER \
-		-e GW_PASS \
-		-e GW_2FA_SECRET \
-		-e GOOGLE_API_CREDENTIALS \
-		-e GOOGLE_API_TOKEN_DATA \
-		-e RADIUS_KEY \
-		-e RADIUS_IPS \
-		-e SUBDOMAIN \
-		-e NOTIFY_SMOKETEST_API_KEY \
-		-e NOTIFY_GO_TEMPLATE_ID \
-		-e GOVWIFI_PHONE_NUMBER \
-		-e SMOKETEST_PHONE_NUMBER \
-		-e NOTIFY_FIELD \
-		-e EAP_TLS_CLIENT_CERT \
-		-e EAP_TLS_CLIENT_KEY \
-		-e ENVIRONMENT \
-		app bundle exec rspec spec/system
+	$(DOCKER_COMPOSE)  run --rm $(TEST_ENV_VARS) app bundle exec rspec spec/system
 
 stop:
 	$(DOCKER_COMPOSE) down -v
 
 shell: build
-	$(DOCKER_COMPOSE) run --rm \
-		-e DOCKER=docker \
-		-e GW_SUPER_ADMIN_USER \
-		-e GW_SUPER_ADMIN_PASS \
-		-e GW_SUPER_ADMIN_2FA_SECRET \
-		-e GW_USER \
-		-e GW_PASS \
-		-e GW_2FA_SECRET \
-		-e GOOGLE_API_CREDENTIALS \
-		-e GOOGLE_API_TOKEN_DATA \
-		-e RADIUS_KEY \
-		-e RADIUS_IPS \
-		-e SUBDOMAIN \
-		-e NOTIFY_SMOKETEST_API_KEY \
-		-e NOTIFY_GO_TEMPLATE_ID \
-		-e GOVWIFI_PHONE_NUMBER \
-		-e SMOKETEST_PHONE_NUMBER \
-		-e NOTIFY_FIELD \
-		-e EAP_TLS_CLIENT_CERT \
-		-e EAP_TLS_CLIENT_KEY \
-		 app bundle exec sh
+	$(DOCKER_COMPOSE) run --rm $(TEST_ENV_VARS) app bundle exec sh
 
 certs:
 	mkdir -p $(CERTIFICATE_PATH)
