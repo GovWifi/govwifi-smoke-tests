@@ -1,3 +1,5 @@
+require "fileutils"
+
 RSpec.shared_context "admin", shared_context: :metadata do
   before(:all) do
     unless ENV["GW_USER"] && ENV["GW_PASS"] && ENV["GW_2FA_SECRET"] && ENV["SUBDOMAIN"]
@@ -10,10 +12,6 @@ RSpec.shared_context "admin", shared_context: :metadata do
   end
 
   after(:each) do |example|
-    if example.exception
-      warn("\e[35m#{page.body}\e[0m")
-    end
-
     # persist the session
     Capybara.current_session.instance_variable_set(:@touched, false)
   end
