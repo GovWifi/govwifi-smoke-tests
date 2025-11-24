@@ -34,6 +34,8 @@ feature "Sponsor Journey" do
     it "has removed any smoke test users" do
       logout
       login(username: ENV["GW_SUPER_ADMIN_USER"], password: ENV["GW_SUPER_ADMIN_PASS"], secret: ENV["GW_SUPER_ADMIN_2FA_SECRET"])
+      #wait for the page to load
+      sleep 2
       click_link("User Details")
       fill_in "Username, email address or phone number", with: @sponsored_email_address
       click_button "Find user details"
@@ -83,6 +85,8 @@ feature "Sponsor Journey" do
         expect(output).to all have_been_successful
       end
       it "can successfully connect to Radius using the credentials in the sms" do
+        #wait for the sms credentials to become accessible from radius.
+        sleep 5
         output = eapol_test.run_peap_mschapv2(username: @sms_username,
                                               password: @sms_password)
         expect(output).to all(have_been_successful), output.join("\n")
