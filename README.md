@@ -15,7 +15,7 @@ The tests run in a headless browser inside a Docker container. You need to provi
 - `SUBDOMAIN` - the subdomain for your particular environment e.g. `wifi` or `staging.wifi`
 - `GOOGLE_API_CREDENTIALS` - token for the Google API.
 - `GOOGLE_API_TOKEN_DATA` - token for the Google API.
-- `NOTIFY_FIELD` - the notify email prefix, for the given environment, govwifi(development, staging, blank) 
+- `NOTIFY_FIELD` - the notify email prefix, for the given environment, govwifi(development, staging, blank)
 - `RADIUS_KEY` - Key to allow access to radius, this is located in the admin app > org > locations
 - `RADIUS_IPS` - allow list for radius, again located in the admin app > org > locations
 - `NOTIFY_SMOKETEST_API_KEY` - api key for notify, see Notify App.
@@ -68,6 +68,10 @@ These are located in the govwifi-terraform repo
 Then run the tests:
 ```make test```
 
+if you want to test the lib tests (currently only testing the SMS route) run
+``` make test-lib```
+This is what is used when the build github action runs.
+
 Particularly when running in an automated remote way, these credentials should be for a dummy organisation/account, with limited access.
 
 You can also run outside of Docker - in this case the tests run in "headed" mode - i.e. you can watch them run in the browser. First you should install dependencies:
@@ -92,7 +96,7 @@ The smoke tests have now been migrated from Concourse to AWS. [Full instructions
 
 ## Adding elastic-ips to GovWifi Admin
 - From AWS environment, get `EC2 > Elastic IP Addresses` filtered by 'smoke'
-- Fetch IP addresses from the column 'Allocated IPv4 address' 
+- Fetch IP addresses from the column 'Allocated IPv4 address'
 - Add IP addresses to GovWifi Admin (https://admin.SUBDOMAIN.service.gov.uk/ips)
 
 ## New Environments
@@ -108,7 +112,7 @@ You can generate them with the following steps:
 * Run `make certs` in your terminal
 (If you need to edit these commands they can be found in [this section of the Smoketests Makefile](https://github.com/GovWifi/govwifi-smoke-tests/blob/4a182cbf609c43c4407dbea87ea956633d470c6c/Makefile#L65-L74))
 
-If you are setting up a new GovWifi environment add these certificates to AWS secret manager. Name the secrets `smoke_tests/certificates/public` for the public key and `smoke_tests/certificates/private` for the private key. 
+If you are setting up a new GovWifi environment add these certificates to AWS secret manager. Name the secrets `smoke_tests/certificates/public` for the public key and `smoke_tests/certificates/private` for the private key.
 
 [You can read more about CBA(Certificate Based Authentication) in our team manual](https://dev-docs.wifi.service.gov.uk/about-govwifi/device-wifi.html#what-is-it)
 

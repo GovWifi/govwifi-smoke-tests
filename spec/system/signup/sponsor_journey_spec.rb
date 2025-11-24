@@ -24,13 +24,18 @@ feature "Sponsor Journey" do
 
     remove_user(user: @sponsored_sms_number)
     remove_user(user: @sponsored_email_address)
-
+    sleep 5 ## ensure messages have different timestamps
     @sponsored_query = "from:#{@notify_address} subject:Welcome is:unread to:#{@sponsored_email_address}"
     @sponsor_query = "from:#{@notify_address} subject:\"accounts have been created for your guests\" is:unread to:#{@sponsor_email_address}"
     set_all_messages_to_read(query: @sponsored_query)
     set_all_messages_to_read(query: @sponsor_query)
   end
   describe "Validate preconditions" do
+    it "should receive user removed sms" do
+      ## check that the next message is the removal message.
+      @sms_message = read_reply_sms(phone_number: @govwifi_sms_number, after_id: nil, created_after: nil, message_type: :deleted)
+      expect(@sms_message).to include("Your GovWifi username and password has been removed.")
+    end
     it "has removed any smoke test users" do
       logout
       login(username: ENV["GW_SUPER_ADMIN_USER"], password: ENV["GW_SUPER_ADMIN_PASS"], secret: ENV["GW_SUPER_ADMIN_2FA_SECRET"])
@@ -49,16 +54,18 @@ feature "Sponsor Journey" do
   end
   describe "Signing up" do
     before :context do
-      first_sms_message_id = get_first_sms(phone_number: @govwifi_sms_number)&.id
+      latest_sms_message = get_latest_sms(phone_number: @govwifi_sms_number)
+      latest_sms_message_id = latest_sms_message&.id
+      latest_sms_message_created_at = latest_sms_message&.created_at
 
       send_email(from_address:, to_address: @signup_address, body: @body)
 
       @email_message = fetch_reply(query: @sponsored_query)
       @sponsor_email_message = fetch_reply(query: @sponsor_query)
-      @sms_message = read_reply_sms(phone_number: @govwifi_sms_number, after_id: first_sms_message_id)
+      @sms_message = read_reply_sms(phone_number: @govwifi_sms_number, after_id: latest_sms_message_id, created_after: latest_sms_message_created_at)
 
-      @sms_username, @sms_password = parse_sms_message(message: @sms_message)
       @email_username, @email_password = parse_email_message(message: @email_message)
+      @sms_username, @sms_password = parse_sms_message(message: @sms_message)
     end
     it "sets the sms username and password" do
       expect(@sms_username).to_not be_nil
@@ -83,6 +90,7 @@ feature "Sponsor Journey" do
         expect(output).to all have_been_successful
       end
       it "can successfully connect to Radius using the credentials in the sms" do
+        puts "\t(Sponsor) Run EAPOL test with SMS Username: #{@sms_username}"
         output = eapol_test.run_peap_mschapv2(username: @sms_username,
                                               password: @sms_password)
         expect(output).to all(have_been_successful), output.join("\n")
