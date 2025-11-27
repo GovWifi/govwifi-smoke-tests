@@ -90,6 +90,7 @@ feature "Sponsor Journey" do
       it "can successfully connect to Radius using the credentials in the sms" do
         #wait for the sms credentials to become accessible from radius.
         sleep 5
+        puts "(Sponsor) Run EAPOL test with SMS Username: #{@sms_username}"
         output = eapol_test.run_peap_mschapv2(username: @sms_username,
                                               password: @sms_password)
         expect(output).to all(have_been_successful), output.join("\n")

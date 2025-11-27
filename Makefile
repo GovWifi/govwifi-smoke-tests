@@ -38,6 +38,9 @@ lint: build
 test: build
 	$(DOCKER_COMPOSE)  run --rm $(TEST_ENV_VARS) app bundle exec rspec spec/system
 
+test-lib: build
+	$(DOCKER_COMPOSE)  run --rm $(TEST_ENV_VARS) app bundle exec rspec spec/lib
+
 stop:
 	$(DOCKER_COMPOSE) down -v
 

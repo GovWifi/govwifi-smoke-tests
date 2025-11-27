@@ -27,7 +27,8 @@ module NotifySms
     rescue Timeout::Error
       last_message = get_first_sms(phone_number: normalised_phone_number)
       warn "Timeout waiting for signup SMS for #{normalised_phone_number}. after_id=#{after_id}, last_received_id=#{last_message&.id}, last_received_content=#{last_message&.content.inspect}"
-      raise "No signup SMS found for #{normalised_phone_number} after id #{after_id}"
+      # Re-raise as Timeout::Error so callers/tests can rely on timeout exceptions
+      raise Timeout::Error, "No signup SMS found for #{normalised_phone_number} after id #{after_id}"
     end
   end
 
