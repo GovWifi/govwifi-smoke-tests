@@ -14,10 +14,12 @@ feature "SMS Journey" do
     end
 
     it "signs up using an SMS journey" do
-      id = get_first_sms(phone_number: ENV["GOVWIFI_PHONE_NUMBER"])&.id
+      first_sms_message = get_first_sms(phone_number: ENV["GOVWIFI_PHONE_NUMBER"])
+      id = first_sms_message&.id
+      created_at = first_sms_message&.created_at
       puts "(SMS) First SMS ID: #{id.inspect}"
       send_go_message(phone_number: ENV["GOVWIFI_PHONE_NUMBER"], template_id: ENV["NOTIFY_GO_TEMPLATE_ID"])
-      message = read_reply_sms(phone_number: ENV["GOVWIFI_PHONE_NUMBER"], after_id: id)
+      message = read_reply_sms(phone_number: ENV["GOVWIFI_PHONE_NUMBER"], after_id: id, after_created_at: created_at)
       username, password = parse_sms_message(message:)
       puts "(SMS) Received username: #{username}"
       output = eapol_test.run_peap_mschapv2(username:, password:)

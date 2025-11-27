@@ -21,50 +21,43 @@ describe NotifySms do
   end
 
   describe "#read_reply_sms" do
-    let(:new_message) { double(id: "new_id", user_number: phone_number, content: "new_body") }
-    let(:old_message) { double(id: "old_id", user_number: phone_number, content: "old_body") }
+    let (:old_message) { double(id: "old_id", user_number: phone_number, created_at: "2024-01-01T12:00:00Z", content: "Username:\nzyxwv\nPassword:\nCarLorryBus") }
+    let (:new_message) { double(id: "new_id", user_number: phone_number, created_at: "2024-01-01T13:00:00Z", content: "Username:\nabcdef\nPassword:\nDogCatFox") }
 
     it "returns the first new message even if it is the first one" do
-      new_message = double(id: "new_id", user_number: phone_number,
-                     content: "Username:\nabcdef\nPassword:\nDogCatFox")
       allow(notify_client).to receive(:get_received_texts).and_return(double(collection: []),
                                                                       double(collection: [new_message]))
       allow(self).to receive(:get_signup_sms).and_return(nil, new_message)
-      expect(read_reply_sms(phone_number:, after_id: nil, timeout: 2, interval: 0)).to eq "Username:\nabcdef\nPassword:\nDogCatFox"
+      expect(read_reply_sms(phone_number:, after_id: nil, after_created_at: nil, timeout: 2, interval: 0)).to eq "Username:\nabcdef\nPassword:\nDogCatFox"
     end
 
     it "returns the first new message" do
-      new_message = double(id: "new_id", user_number: phone_number,
-                     content: "Username:\nabcdef\nPassword:\nDogCatFox")
-      old_message = double(id: "old_id", user_number: phone_number,
-                     content: "Username:\nzyxwv\nPassword:\nCarLorryBus")
-
       allow(notify_client).to receive(:get_received_texts).and_return(double(collection: [old_message]),
                                                                       double(collection: [new_message, old_message]))
       allow(self).to receive(:get_signup_sms).and_return(nil, new_message)
-      expect(read_reply_sms(phone_number:, after_id: "old_id", timeout: 2, interval: 0)).to eq "Username:\nabcdef\nPassword:\nDogCatFox"
+      expect(read_reply_sms(phone_number:, after_id: "old_id", after_created_at: "2024-01-01T12:00:00Z", timeout: 2, interval: 0)).to eq "Username:\nabcdef\nPassword:\nDogCatFox"
     end
     it "times out" do
       allow(notify_client).to receive(:get_received_texts).and_return(double(collection: [old_message]))
-      expect { read_reply_sms(phone_number:, after_id: "old_id", timeout: 2, interval: 0) }.to raise_error(Timeout::Error)
+      expect { read_reply_sms(phone_number:, after_id: "old_id", after_created_at: "2024-01-01T12:00:00Z",timeout: 2, interval: 0) }.to raise_error(Timeout::Error)
     end
   end
 
   describe "normalise phone numbers" do
     before :each do
-      new_message = double(id: "new_id", user_number: phone_number,
+      new_message = double(id: "new_id", user_number: phone_number, created_at: "2024-01-01T13:00:00Z",
                      content: "Username:\nabcdef\nPassword:\nDogCatFox")
-      old_message = double(id: "old_id", user_number: phone_number,
+      old_message = double(id: "old_id", user_number: phone_number,created_at: "2024-01-01T12:00:00Z",
                      content: "Username:\nzyxwv\nPassword:\nCarLorryBus")
       allow(notify_client).to receive(:get_received_texts).and_return(double(collection: [old_message]),
                                                                       double(collection: [new_message, old_message]))
       allow(self).to receive(:get_signup_sms).and_return(nil, new_message)
     end
     it "removes the + from the phone number" do
-      expect(read_reply_sms(phone_number: "+#{phone_number}", after_id: "old_id", timeout: 2, interval: 0)).to eq "Username:\nabcdef\nPassword:\nDogCatFox"
+      expect(read_reply_sms(phone_number: "+#{phone_number}", after_id: "old_id", after_created_at: "2024-01-01T12:00:00Z", timeout: 2, interval: 0)).to eq "Username:\nabcdef\nPassword:\nDogCatFox"
     end
     it "replaces '0' with '44' if the phone number is not international" do
-      expect(read_reply_sms(phone_number: "07700900000", after_id: "old_id", timeout: 2, interval: 0)).to eq "Username:\nabcdef\nPassword:\nDogCatFox"
+      expect(read_reply_sms(phone_number: "07700900000", after_id: "old_id", after_created_at: "2024-01-01T12:00:00Z", timeout: 2, interval: 0)).to eq "Username:\nabcdef\nPassword:\nDogCatFox"
     end
   end
 

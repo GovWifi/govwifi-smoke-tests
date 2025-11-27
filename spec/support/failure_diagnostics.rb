@@ -27,19 +27,19 @@ RSpec.configure do |config|
         end
 
         # Browser console logs (Selenium)
-        begin
-          if Capybara.current_session.driver.browser.respond_to?(:manage) &&
-             Capybara.current_session.driver.browser.manage.respond_to?(:logs)
-            logs = Capybara.current_session.driver.browser.manage.logs.get(:browser)
-            warn("---- BROWSER CONSOLE LOGS START ----")
-            logs.each { |l| warn("[#{l.level}] #{l.message}") }
-            warn("---- BROWSER CONSOLE LOGS END ----")
-          else
-            warn("Browser console logs: <unsupported by driver>")
-          end
-        rescue StandardError => e
-          warn("Could not capture browser console logs: #{e.message}")
-        end
+        # begin
+        #   if Capybara.current_session.driver.browser.respond_to?(:manage) &&
+        #      Capybara.current_session.driver.browser.manage.respond_to?(:logs)
+        #     logs = Capybara.current_session.driver.browser.manage.logs.get(:browser)
+        #     warn("---- BROWSER CONSOLE LOGS START ----")
+        #     logs.each { |l| warn("[#{l.level}] #{l.message}") }
+        #     warn("---- BROWSER CONSOLE LOGS END ----")
+        #   else
+        #     warn("Browser console logs: <unsupported by driver>")
+        #   end
+        # rescue StandardError => e
+        #   warn("Could not capture browser console logs: #{e.message}")
+        # end
 
         # Screenshot as base64 (print to logs so CI can save it if needed)
         begin

@@ -32,8 +32,10 @@ feature "Sponsor Journey" do
   end
   describe "Validate preconditions" do
     it "should receive user removed sms" do
-      first_sms_message_id = get_first_sms(phone_number: @govwifi_sms_number)&.id
-      @sms_message = read_reply_sms(phone_number: @govwifi_sms_number, after_id: first_sms_message_id)
+      first_sms_message = get_first_sms(phone_number: @govwifi_sms_number)
+      first_sms_message_id = first_sms_message&.id
+      first_sms_message_created_at = first_sms_message&.created_at
+      @sms_message = read_reply_sms(phone_number: @govwifi_sms_number, after_id: first_sms_message_id, after_created_at: first_sms_message_created_at)
       expect(@sms_message).to include("Your account has been removed from GovWifi.")
     end
     it "has removed any smoke test users" do

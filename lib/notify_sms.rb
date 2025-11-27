@@ -10,14 +10,26 @@ module NotifySms
   # This helper method reads reply SMS messages sent to a given phone number after a given message ID.
   # It polls Notify until a new message is found or the timeout is reached.
   # Throws an error if no new message is found within the timeout period.
-  def read_reply_sms(phone_number:, after_id:, timeout: 600, interval: 5)
+  # param phone_number The phone number to read messages for.
+  # param after_id The message ID to read messages after.
+  # param after_created_at The created_at timestamp of the message with after_id, to ensure we only consider messages created after this time.
+  # param timeout The maximum time to wait for a new message, in seconds. Default is 600 seconds (10 minutes).
+  # param interval The interval between polling attempts, in seconds. Default is 5 seconds.
+  # return The content of the first new message found.
+  def read_reply_sms(phone_number:, after_id:, after_created_at:, timeout: 600, interval: 5)
     normalised_phone_number = normalise(phone_number:)
+    puts "(NotifySms) Waiting for signup SMS for #{normalised_phone_number} after id #{after_id} created at #{after_created_at}"
+    after_time = after_created_at ? Time.parse(after_created_at) : Time.at(0) # Epoch time if nil
     begin
       Timeout.timeout(timeout, nil, "Waited too long for signup SMS. Last received SMS is #{after_id}") do
         result = nil
         loop do
           result = get_signup_sms(phone_number: normalised_phone_number)
-          break if result && result.id != after_id
+          if result
+            puts "(NotifySms) Found SMS with ID #{result.id} created at #{result.created_at}"
+            message_time = Time.parse(result.created_at)
+            break if result.id != after_id && message_time > after_time
+          end
 
           print "."
           sleep interval
