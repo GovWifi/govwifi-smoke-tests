@@ -8,10 +8,11 @@ feature "SMS Journey" do
   end
   it "signs up using an SMS journey" do
     id = get_first_sms(phone_number: ENV["GOVWIFI_PHONE_NUMBER"])&.id
+    puts "(SMS) First SMS ID: #{id.inspect}"
     send_go_message(phone_number: ENV["GOVWIFI_PHONE_NUMBER"], template_id: ENV["NOTIFY_GO_TEMPLATE_ID"])
     message = read_reply_sms(phone_number: ENV["GOVWIFI_PHONE_NUMBER"], after_id: id)
     username, password = parse_sms_message(message:)
-
+    puts "(SMS) Received username: #{username.inspect}"
     eapol_test = GovwifiEapoltest.new(radius_ips: ENV["RADIUS_IPS"].split(","),
                                       secret: ENV["RADIUS_KEY"])
 
