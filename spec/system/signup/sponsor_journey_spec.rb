@@ -57,13 +57,16 @@ feature "Sponsor Journey" do
   end
   describe "Signing up" do
     before :context do
-      first_sms_message_id = get_first_sms(phone_number: @govwifi_sms_number)&.id
-      puts "(Sponsor) First SMS message ID: #{first_sms_message_id}"
+      first_sms_message = get_first_sms(phone_number: @govwifi_sms_number)
+      first_sms_message_id = first_sms_message&.id
+      first_sms_message_created_at = first_sms_message&.created_at
+
+      puts "(Sponsor) First SMS message ID: #{first_sms_message_id}, created at: #{first_sms_message_created_at}"
       send_email(from_address:, to_address: @signup_address, body: @body)
 
       @email_message = fetch_reply(query: @sponsored_query)
       @sponsor_email_message = fetch_reply(query: @sponsor_query)
-      @sms_message = read_reply_sms(phone_number: @govwifi_sms_number, after_id: first_sms_message_id)
+      @sms_message = read_reply_sms(phone_number: @govwifi_sms_number, after_id: first_sms_message_id, after_created_at: first_sms_message_created_at)
 
       @email_username, @email_password = parse_email_message(message: @email_message)
       @sms_username, @sms_password = parse_sms_message(message: @sms_message)
