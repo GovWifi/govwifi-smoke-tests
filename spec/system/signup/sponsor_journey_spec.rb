@@ -31,11 +31,15 @@ feature "Sponsor Journey" do
     set_all_messages_to_read(query: @sponsor_query)
   end
   describe "Validate preconditions" do
+    it "should receive user removed sms" do
+      first_sms_message_id = get_first_sms(phone_number: @govwifi_sms_number)&.id
+      @sms_message = read_reply_sms(phone_number: @govwifi_sms_number, after_id: first_sms_message_id)
+      expect(@sms_message).to include("Your account has been removed from GovWifi.")
+    end
     it "has removed any smoke test users" do
       logout
       login(username: ENV["GW_SUPER_ADMIN_USER"], password: ENV["GW_SUPER_ADMIN_PASS"], secret: ENV["GW_SUPER_ADMIN_2FA_SECRET"])
       #wait for the page to load
-      sleep 2
       click_link("User Details")
       fill_in "Username, email address or phone number", with: @sponsored_email_address
       click_button "Find user details"
@@ -52,17 +56,15 @@ feature "Sponsor Journey" do
   describe "Signing up" do
     before :context do
       first_sms_message_id = get_first_sms(phone_number: @govwifi_sms_number)&.id
-      puts "(Sponsor) First SMS message ID: #{first_sms_message_id.inspect}"
+      puts "(Sponsor) First SMS message ID: #{first_sms_message_id}"
       send_email(from_address:, to_address: @signup_address, body: @body)
 
       @email_message = fetch_reply(query: @sponsored_query)
       @sponsor_email_message = fetch_reply(query: @sponsor_query)
       @sms_message = read_reply_sms(phone_number: @govwifi_sms_number, after_id: first_sms_message_id)
 
-      puts "(Sponsor) SMS Message: #{@sms_message.inspect}"
-
-      @sms_username, @sms_password = parse_sms_message(message: @sms_message)
       @email_username, @email_password = parse_email_message(message: @email_message)
+      @sms_username, @sms_password = parse_sms_message(message: @sms_message)
       puts "(Sponsor) SMS Username: #{@sms_username}"
     end
     it "sets the sms username and password" do
@@ -88,8 +90,6 @@ feature "Sponsor Journey" do
         expect(output).to all have_been_successful
       end
       it "can successfully connect to Radius using the credentials in the sms" do
-        #wait for the sms credentials to become accessible from radius.
-        sleep 5
         puts "(Sponsor) Run EAPOL test with SMS Username: #{@sms_username}"
         output = eapol_test.run_peap_mschapv2(username: @sms_username,
                                               password: @sms_password)

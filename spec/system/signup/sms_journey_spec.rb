@@ -19,7 +19,7 @@ feature "SMS Journey" do
       send_go_message(phone_number: ENV["GOVWIFI_PHONE_NUMBER"], template_id: ENV["NOTIFY_GO_TEMPLATE_ID"])
       message = read_reply_sms(phone_number: ENV["GOVWIFI_PHONE_NUMBER"], after_id: id)
       username, password = parse_sms_message(message:)
-      puts "(SMS) Received username: #{username.inspect}"
+      puts "(SMS) Received username: #{username}"
       output = eapol_test.run_peap_mschapv2(username:, password:)
       expect(output).to all(have_been_successful), output.join("\n")
     end

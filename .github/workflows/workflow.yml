@@ -1,4 +1,4 @@
-name: smoke-test build and lint
+name: smoke-test build, lint and test
 on:
   push:
     branches:
