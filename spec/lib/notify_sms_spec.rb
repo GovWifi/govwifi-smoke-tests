@@ -103,7 +103,7 @@ describe NotifySms do
   end
 
   describe "When calling the read reply sms method" do
-    let(:deleted_message_content) { "Your account has been removed from GovWifi." }
+    let(:deleted_message_content) { "Your account has been removed from GovWifi. Your account has been removed from GovWifi. If you need to sign up again, text 'Go' to 07537 417 417." }
     let(:deleted_message) {double(:message, id: "new_deleted_id",content: deleted_message_content, created_at: "2025-11-27 14:02:33 UTC" )}
 
     # The old message must still be defined for the collection stub
@@ -122,6 +122,50 @@ describe NotifySms do
 
       # 3. Call read_reply_sms, specifying message_type: :delete and checking the expected content.
       expect(read_reply_sms(phone_number: phone_number, after_id: "old_id", after_created_at: "2025-11-27 13:52:33 UTC",  message_type: :deleted,timeout: 2, interval: 0)).to eq deleted_message_content
+    end
+  end
+
+  describe "#get_deleted_sms" do
+    let(:phone_number) { "07700900000" }
+    let(:normalised_phone) { "447700900000" } # Assuming normalise() works
+
+    # The exact message content the method checks for
+    let(:deleted_message_content) { "Your account has been removed from GovWifi." }
+
+    # A mock message object containing the correct content
+    let(:deleted_message_object) {double(:message,id: "deleted_id_123",content: deleted_message_content, user_number: normalised_phone, created_at: Time.now.iso8601 )}
+    # A mock message object containing incorrect content
+    let(:incorrect_message_object) {double(:message, id: "wrong_id_456", content: "Your GovWifi account has been removed.", user_number: normalised_phone, created_at: Time.now.iso8601 )}
+
+    it "returns the message object when content matches the deleted message exactly" do
+      # Stub the prerequisite method to return the correct message
+      allow(self).to receive(:get_latest_sms).and_return(deleted_message_object)
+
+      result = get_deleted_sms(phone_number: phone_number)
+
+      # The result should be the actual message object
+      expect(result).to eq deleted_message_object
+      expect(result.content).to eq deleted_message_content
+    end
+
+    it "returns nil when the content does not match the deleted message" do
+      # Stub the prerequisite method to return a message with incorrect content
+      allow(self).to receive(:get_latest_sms).and_return(incorrect_message_object)
+
+      result = get_deleted_sms(phone_number: phone_number)
+
+      # The result should be nil because the content check failed
+      expect(result).to be_nil
+    end
+
+    it "returns nil when no messages are available" do
+      # Stub the prerequisite method to return nil (no messages found)
+      allow(self).to receive(:get_latest_sms).and_return(nil)
+
+      result = get_deleted_sms(phone_number: phone_number)
+
+      # The result should be nil because there was no message to check
+      expect(result).to be_nil
     end
   end
 end

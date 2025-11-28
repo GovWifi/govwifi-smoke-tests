@@ -20,7 +20,7 @@ module NotifySms
   # return The content of the first new message found.
   def read_reply_sms(phone_number:, after_id:, after_created_at:, message_type: :signup, timeout: 600, interval: 5)
     normalised_phone_number = normalise(phone_number:)
-    puts "(NotifySms) Waiting for signup SMS for #{normalised_phone_number} after id #{after_id} created at #{after_created_at}"
+    puts "(NotifySms) Waiting for SMS message for #{normalised_phone_number} after id #{after_id} created at #{after_created_at}"
     after_time = parse_time_object(after_created_at)
     puts "(NotifySms) after_time parsed as #{after_time}"
     begin
@@ -88,7 +88,7 @@ module NotifySms
     deleted_message = "Your account has been removed from GovWifi."
 
     # We look for an exact match, but you might need .include? if other text is present
-    if message.content.strip == deleted_message
+    if message.content.strip.include?(deleted_message)
       puts "(NotifySms) Found deleted account message ID #{message.id}."
       return message
     else
