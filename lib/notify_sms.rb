@@ -39,14 +39,14 @@ module NotifySms
         result.content
       end
     rescue Timeout::Error
-      last_message = get_first_sms(phone_number: normalised_phone_number)
+      last_message = get_latest_sms(phone_number: normalised_phone_number)
       warn "Timeout waiting for signup SMS for #{normalised_phone_number}. after_id=#{after_id}, last_received_id=#{last_message&.id}, last_received_content=#{last_message&.content.inspect}"
       # Re-raise as Timeout::Error so callers/tests can rely on timeout exceptions
       raise Timeout::Error, "No signup SMS found for #{normalised_phone_number} after id #{after_id}"
     end
   end
 
-  def get_first_sms(phone_number:)
+  def get_latest_sms(phone_number:)
     Services.notify.get_received_texts.collection.find { |message| message.user_number == normalise(phone_number:) }
   end
 
@@ -55,12 +55,16 @@ module NotifySms
   # 1. Has the correct phone number.
   # 2. Contains the parsed text.
   def get_signup_sms(phone_number:)
-    message = get_first_sms(phone_number:)
+    message = get_latest_sms(phone_number:)
+    return nil unless message
     begin
       # parse_sms_message raises when it doesn't match; rescue and treat as non-match
+      puts "(NotifySms) Checking message ID #{message&.id} for signup content"
       !parse_sms_message(message: message.content).nil?
+      # If message parses correctly, return message or nil if it doesn't match
+      return !parse_sms_message(message: message.content).nil? ? message : nil
     rescue StandardError
-      false
+      return nil
     end
   end
 
@@ -79,11 +83,11 @@ module NotifySms
     case after_created_at
     when String
       # Case 1: Input is the expected String format (e.g., from the API response)
-      puts "(NotifySms) Parsing after_created_at string: #{after_created_at}"
+      puts "(NotifySms) after_created_at was type string: #{after_created_at}"
       return Time.parse(after_created_at)
     when Time
       # Case 2: Input is an unexpected Time object (Ruby 'helpfully' passing Time objects in some cases)
-      puts "(NotifySms) Converting after_created_at Time object to Time: #{after_created_at.iso8601}"
+      puts "(NotifySms) after_created_at was Time object: #{after_created_at.iso8601}"
       return after_created_at
     when nil
       # Case 3: Input is nil (first run with no prior SMS) Set to the Unix Epoch (Time.at(0)) for comparison

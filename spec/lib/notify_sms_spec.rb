@@ -24,7 +24,7 @@ describe NotifySms do
     let (:old_message) { double(id: "old_id", user_number: phone_number, created_at: "2025-11-27 13:52:33 UTC", content: "Username:\nzyxwv\nPassword:\nCarLorryBus") }
     let (:new_message) { double(id: "new_id", user_number: phone_number, created_at: "2025-11-27 14:52:33 UTC", content: "Username:\nabcdef\nPassword:\nDogCatFox") }
 
-    it "returns the first new message even if it is the first one" do
+    it "returns the latest new message even if it is the first one" do
       allow(notify_client).to receive(:get_received_texts).and_return(double(collection: []),
                                                                       double(collection: [new_message]))
       allow(self).to receive(:get_signup_sms).and_return(nil, new_message)
@@ -78,13 +78,13 @@ describe NotifySms do
   end
 
 
-  describe "When get_first_sms is called" do
+  describe "When get_latest_sms is called" do
     let(:message1) { double(id: "id1", user_number: "07701111111", content: "body1") }
     let(:message2) { double(id: "id2", user_number: phone_number, content: "body2") }
 
     it "should Ignores messages from other phone numbers" do
       allow(notify_client).to receive(:get_received_texts).and_return(double(collection: [message1, message2]))
-      expect(get_first_sms(phone_number:).id).to eq("id2")
+      expect(get_latest_sms(phone_number:).id).to eq("id2")
     end
   end
 
