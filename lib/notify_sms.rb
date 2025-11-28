@@ -18,7 +18,7 @@ module NotifySms
   # param timeout The maximum time to wait for a new message, in seconds. Default is 600 seconds (10 minutes).
   # param interval The interval between polling attempts, in seconds. Default is 5 seconds.
   # return The content of the first new message found.
-  def read_reply_sms(phone_number:, after_id:, after_created_at:, timeout: 600, interval: 5)
+  def read_reply_sms(phone_number:, after_id:, after_created_at:, message_type: :signup, timeout: 600, interval: 5)
     normalised_phone_number = normalise(phone_number:)
     puts "(NotifySms) Waiting for signup SMS for #{normalised_phone_number} after id #{after_id} created at #{after_created_at}"
     after_time = parse_time_object(after_created_at)
@@ -27,7 +27,8 @@ module NotifySms
       Timeout.timeout(timeout, nil, "Waited too long for signup SMS. Last received SMS is #{after_id}") do
         result = nil
         loop do
-          result = get_signup_sms(phone_number: normalised_phone_number)
+          ## check if it's a signup or deleted message, and call the appropriate method.
+          result = message_type == :signup ? get_signup_sms(phone_number: normalised_phone_number) : get_deleted_sms(phone_number: normalised_phone_number)
           if result
             message_time = parse_time_object(result.created_at)
             break if result.id != after_id && message_time > after_time
@@ -75,6 +76,25 @@ module NotifySms
 
   def normalise(phone_number:)
     phone_number.delete("+").sub(/^0/, "44")
+  end
+
+  def get_deleted_sms(phone_number:)
+    message = get_latest_sms(phone_number:)
+
+    # Return nil immediately if no message was found
+    return nil unless message
+
+    # The exact deletion message you are looking for
+    deleted_message = "Your account has been removed from GovWifi."
+
+    # We look for an exact match, but you might need .include? if other text is present
+    if message.content.strip == deleted_message
+      puts "(NotifySms) Found deleted account message ID #{message.id}."
+      return message
+    else
+      puts "(NotifySms) Message ID #{message.id} does not contain the deleted account content."
+      return nil
+    end
   end
 
   ## Helper method to parse the after_created_at parameter into a Time object.

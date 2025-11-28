@@ -43,7 +43,7 @@ describe NotifySms do
     end
   end
 
-  describe "" do
+  describe "When calling the get reply sms method with a time object when Ruby auto converts the string to time." do
     before :each do
       new_message = double(id: "new_id", user_number: phone_number, created_at: "2025-11-27 14:52:33 UTC",
                      content: "Username:\nabcdef\nPassword:\nDogCatFox")
@@ -57,7 +57,6 @@ describe NotifySms do
       expect(read_reply_sms(phone_number:, after_id: "old_id", after_created_at: Time.parse("2025-11-27 14:00:33 UTC"), timeout: 2, interval: 0)).to eq "Username:\nabcdef\nPassword:\nDogCatFox"
     end
   end
-
 
   describe "normalise phone numbers" do
     before :each do
@@ -76,7 +75,6 @@ describe NotifySms do
       expect(read_reply_sms(phone_number: "07700900000", after_id: "old_id", after_created_at: "2024-01-01T12:00:00Z", timeout: 2, interval: 0)).to eq "Username:\nabcdef\nPassword:\nDogCatFox"
     end
   end
-
 
   describe "When get_latest_sms is called" do
     let(:message1) { double(id: "id1", user_number: "07701111111", content: "body1") }
@@ -101,6 +99,29 @@ describe NotifySms do
         Go to your wifi settings, select 'GovWifi' and enter your details.
       HTML
       expect(parse_sms_message(message:)).to eq %w[abcdef DogCatFox]
+    end
+  end
+
+  describe "When calling the read reply sms method" do
+    let(:deleted_message_content) { "Your account has been removed from GovWifi." }
+    let(:deleted_message) {double(:message, id: "new_deleted_id",content: deleted_message_content, created_at: "2025-11-27 14:02:33 UTC" )}
+
+    # The old message must still be defined for the collection stub
+    let(:old_message_deleted_flow) {double(:message,id: "old_id", content: "some other content", created_at: "2025-11-27 13:52:33 UTC" )}
+
+    it "should return the first new deleted message" do
+      # 1. Stub the low-level API call (get_received_texts) to return the old message first, then the new one.
+      allow(notify_client).to receive(:get_received_texts).and_return(
+        double(collection: [old_message_deleted_flow]),
+        double(collection: [deleted_message, old_message_deleted_flow])
+      )
+
+      # 2. Stub the high-level retrieval method (get_deleted_sms) to return nil first (no match), then the new message.
+      # This simulates the new message arriving and matching the content filter.
+      allow(self).to receive(:get_deleted_sms).and_return(nil, deleted_message)
+
+      # 3. Call read_reply_sms, specifying message_type: :delete and checking the expected content.
+      expect(read_reply_sms(phone_number: phone_number, after_id: "old_id", after_created_at: "2025-11-27 13:52:33 UTC",  message_type: :deleted,timeout: 2, interval: 0)).to eq deleted_message_content
     end
   end
 end

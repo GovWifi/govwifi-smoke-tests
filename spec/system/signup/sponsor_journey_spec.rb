@@ -35,13 +35,12 @@ feature "Sponsor Journey" do
       latest_sms_message = get_latest_sms(phone_number: @govwifi_sms_number)
       latest_sms_message_id = latest_sms_message&.id
       latest_sms_message_created_at = latest_sms_message&.created_at
-      @sms_message = read_reply_sms(phone_number: @govwifi_sms_number, after_id: latest_sms_message_id, after_created_at: latest_sms_message_created_at)
+      @sms_message = read_reply_sms(phone_number: @govwifi_sms_number, after_id: latest_sms_message_id, after_created_at: latest_sms_message_created_at, message_type: :deleted)
       expect(@sms_message).to include("Your account has been removed from GovWifi.")
     end
     it "has removed any smoke test users" do
       logout
       login(username: ENV["GW_SUPER_ADMIN_USER"], password: ENV["GW_SUPER_ADMIN_PASS"], secret: ENV["GW_SUPER_ADMIN_2FA_SECRET"])
-      #wait for the page to load
       click_link("User Details")
       fill_in "Username, email address or phone number", with: @sponsored_email_address
       click_button "Find user details"
