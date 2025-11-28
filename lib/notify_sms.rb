@@ -55,7 +55,7 @@ module NotifySms
   # 1. Has the correct phone number.
   # 2. Contains the parsed text.
   def get_signup_sms(phone_number:)
-    message = get_first_sms(phone_number)
+    message = get_first_sms(phone_number:)
     begin
       # parse_sms_message raises when it doesn't match; rescue and treat as non-match
       !parse_sms_message(message: message.content).nil?
