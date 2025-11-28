@@ -21,8 +21,8 @@ describe NotifySms do
   end
 
   describe "#read_reply_sms" do
-    let (:old_message) { double(id: "old_id", user_number: phone_number, created_at: "2024-01-01T12:00:00Z", content: "Username:\nzyxwv\nPassword:\nCarLorryBus") }
-    let (:new_message) { double(id: "new_id", user_number: phone_number, created_at: "2024-01-01T13:00:00Z", content: "Username:\nabcdef\nPassword:\nDogCatFox") }
+    let (:old_message) { double(id: "old_id", user_number: phone_number, created_at: "2025-11-27 13:52:33 UTC", content: "Username:\nzyxwv\nPassword:\nCarLorryBus") }
+    let (:new_message) { double(id: "new_id", user_number: phone_number, created_at: "2025-11-27 14:52:33 UTC", content: "Username:\nabcdef\nPassword:\nDogCatFox") }
 
     it "returns the first new message even if it is the first one" do
       allow(notify_client).to receive(:get_received_texts).and_return(double(collection: []),
@@ -35,13 +35,29 @@ describe NotifySms do
       allow(notify_client).to receive(:get_received_texts).and_return(double(collection: [old_message]),
                                                                       double(collection: [new_message, old_message]))
       allow(self).to receive(:get_signup_sms).and_return(nil, new_message)
-      expect(read_reply_sms(phone_number:, after_id: "old_id", after_created_at: "2024-01-01T12:00:00Z", timeout: 2, interval: 0)).to eq "Username:\nabcdef\nPassword:\nDogCatFox"
+      expect(read_reply_sms(phone_number:, after_id: "old_id", after_created_at: "2025-11-27 13:52:33 UTC", timeout: 2, interval: 0)).to eq "Username:\nabcdef\nPassword:\nDogCatFox"
     end
     it "times out" do
       allow(notify_client).to receive(:get_received_texts).and_return(double(collection: [old_message]))
-      expect { read_reply_sms(phone_number:, after_id: "old_id", after_created_at: "2024-01-01T12:00:00Z",timeout: 2, interval: 0) }.to raise_error(Timeout::Error)
+      expect { read_reply_sms(phone_number:, after_id: "old_id", after_created_at: "2025-11-27 13:52:33 UTC",timeout: 2, interval: 0) }.to raise_error(Timeout::Error)
     end
   end
+
+  describe "" do
+    before :each do
+      new_message = double(id: "new_id", user_number: phone_number, created_at: "2025-11-27 14:52:33 UTC",
+                     content: "Username:\nabcdef\nPassword:\nDogCatFox")
+      old_message = double(id: "old_id", user_number: phone_number, created_at: "2025-11-27 13:52:33 UTC",
+                     content: "Username:\nzyxwv\nPassword:\nCarLorryBus")
+      allow(notify_client).to receive(:get_received_texts).and_return(double(collection: []),
+                                                                      double(collection: [new_message]))
+      allow(self).to receive(:get_signup_sms).and_return(nil, new_message)
+    end
+    it "Should expect a message with default time set to 1970 is no created date found." do
+      expect(read_reply_sms(phone_number:, after_id: "old_id", after_created_at: Time.parse("2025-11-27 14:00:33 UTC"), timeout: 2, interval: 0)).to eq "Username:\nabcdef\nPassword:\nDogCatFox"
+    end
+  end
+
 
   describe "normalise phone numbers" do
     before :each do
@@ -62,18 +78,18 @@ describe NotifySms do
   end
 
 
-  describe "#get_first_sms" do
+  describe "When get_first_sms is called" do
     let(:message1) { double(id: "id1", user_number: "07701111111", content: "body1") }
     let(:message2) { double(id: "id2", user_number: phone_number, content: "body2") }
 
-    it "Ignores messages from other phone numbers" do
+    it "should Ignores messages from other phone numbers" do
       allow(notify_client).to receive(:get_received_texts).and_return(double(collection: [message1, message2]))
       expect(get_first_sms(phone_number:).id).to eq("id2")
     end
   end
 
-  describe "#parse_message" do
-    it "parses the message" do
+  describe "when parse_message is called " do
+    it "should parses the message and return the user and password" do
       message = <<~HTML
         Windows, Apple, and Chromebook users:
         Username:

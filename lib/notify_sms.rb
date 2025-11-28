@@ -1,4 +1,6 @@
 require_relative "../lib/services"
+require 'time' ## not sure I need this, but Time.parse gives error without it in some contexts
+
 module NotifySms
   def send_go_message(phone_number:, template_id:)
     Services.notify.send_sms(
@@ -12,22 +14,22 @@ module NotifySms
   # Throws an error if no new message is found within the timeout period.
   # param phone_number The phone number to read messages for.
   # param after_id The message ID to read messages after.
-  # param after_created_at The created_at timestamp of the message with after_id, to ensure we only consider messages created after this time.
+  # param after_created_at The created_at timestamp of the message with after_id, to ensure we only consider messages created after this time, supposed to be a string, but Ruby is 'helpfully' passing Time objects in some cases, ugh!!
   # param timeout The maximum time to wait for a new message, in seconds. Default is 600 seconds (10 minutes).
   # param interval The interval between polling attempts, in seconds. Default is 5 seconds.
   # return The content of the first new message found.
   def read_reply_sms(phone_number:, after_id:, after_created_at:, timeout: 600, interval: 5)
     normalised_phone_number = normalise(phone_number:)
     puts "(NotifySms) Waiting for signup SMS for #{normalised_phone_number} after id #{after_id} created at #{after_created_at}"
-    after_time = after_created_at ? Time.parse(after_created_at) : Time.at(0) # Epoch time if nil
+    after_time = parse_time_object(after_created_at)
+    puts "(NotifySms) after_time parsed as #{after_time}"
     begin
       Timeout.timeout(timeout, nil, "Waited too long for signup SMS. Last received SMS is #{after_id}") do
         result = nil
         loop do
           result = get_signup_sms(phone_number: normalised_phone_number)
           if result
-            puts "(NotifySms) Found SMS with ID #{result.id} created at #{result.created_at}"
-            message_time = Time.parse(result.created_at)
+            message_time = parse_time_object(result.created_at)
             break if result.id != after_id && message_time > after_time
           end
 
@@ -53,18 +55,12 @@ module NotifySms
   # 1. Has the correct phone number.
   # 2. Contains the parsed text.
   def get_signup_sms(phone_number:)
-    normalised_phone_number = normalise(phone_number:)
-    messages = Services.notify.get_received_texts.collection
-    messages.find do |message|
-      # ensure phone matches first
-      next false unless message.user_number == normalised_phone_number
-
-      begin
-        # parse_sms_message raises when it doesn't match; rescue and treat as non-match
-        !parse_sms_message(message: message.content).nil?
-      rescue StandardError
-        false
-      end
+    message = get_first_sms(phone_number)
+    begin
+      # parse_sms_message raises when it doesn't match; rescue and treat as non-match
+      !parse_sms_message(message: message.content).nil?
+    rescue StandardError
+      false
     end
   end
 
@@ -75,5 +71,28 @@ module NotifySms
 
   def normalise(phone_number:)
     phone_number.delete("+").sub(/^0/, "44")
+  end
+
+  ## Helper method to parse the after_created_at parameter into a Time object.
+  ## Handles different input types: String, Time, or nil.
+  def parse_time_object(after_created_at)
+    case after_created_at
+    when String
+      # Case 1: Input is the expected String format (e.g., from the API response)
+      puts "(NotifySms) Parsing after_created_at string: #{after_created_at}"
+      return Time.parse(after_created_at)
+    when Time
+      # Case 2: Input is an unexpected Time object (Ruby 'helpfully' passing Time objects in some cases)
+      puts "(NotifySms) Converting after_created_at Time object to Time: #{after_created_at.iso8601}"
+      return after_created_at
+    when nil
+      # Case 3: Input is nil (first run with no prior SMS) Set to the Unix Epoch (Time.at(0)) for comparison
+      puts "(NotifySms) after_created_at is nil, setting to Epoch time"
+      return Time.at(0)
+    else
+      # Safety: Handle totally unexpected types
+      raise ArgumentError, "Unexpected type for after_created_at: #{after_created_at.class}"
+    end
+
   end
 end
