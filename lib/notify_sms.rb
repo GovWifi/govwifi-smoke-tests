@@ -107,7 +107,8 @@ module NotifySms
     if message.strip.include?(deleted_message)
       message
     else
-      warn "(NotifySms) Message ID #{message.id} does not contain the deleted account content: #{message&.content&.lines&.first&.strip}"
+      # uncomment for debugging
+      # warn "(NotifySms) Message ID #{message.id} does not contain the deleted account content: #{message&.content&.lines&.first&.strip}"
       raise StandardError
     end
   end
