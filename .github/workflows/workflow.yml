@@ -1,4 +1,4 @@
-name: smoke-test build and lint
+name: smoke-test build, lint and test
 on:
   push:
     branches:
@@ -14,3 +14,10 @@ jobs:
       - uses: actions/checkout@v4
       - name: Run lint
         run: make lint
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Lib Tests
+        run: make test-lib
