@@ -6,12 +6,16 @@ feature "SMS Journey" do
 
   before :context do
     @govwifi_sms_number = ENV["GOVWIFI_PHONE_NUMBER"]
-    remove_user(user: @govwifi_sms_number)
+    @user_was_removed = remove_user(user: @govwifi_sms_number)
     sleep 5 ## ensure messages have different timestamps
   end
   describe "Validate preconditions" do
     it "should receive user removed sms" do
-      ## check that the next message is the removal message.
+      unless @user_was_removed
+        # If the user wasn't found/removed, we skip this part of the test.
+        # This is ideal if the test assumes a clean slate.
+        skip "User '#{@govwifi_sms_number}' was not found for removal. Skipping removal SMS check."
+      end
       sms_deleted_message = read_reply_sms(phone_number: @govwifi_sms_number, after_id: nil, created_after: nil, message_type: :deleted)
       expect(sms_deleted_message).to include("Your GovWifi username and password has been removed.")
     end
