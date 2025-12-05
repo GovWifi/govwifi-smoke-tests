@@ -1,6 +1,8 @@
 require_relative "../lib/services"
 
 module NotifySms
+  ## This helper method sends a "GO" message to a given phone number using the specified Notify template ID.
+  ## The phone number of the text message recipient. This can be a UK or international number, in E.164 format (e.g., +447700900123), must include +44 country code for UK numbers.
   def send_go_message(phone_number:, template_id:)
     Services.notify.send_sms(
       phone_number:,
@@ -11,7 +13,7 @@ module NotifySms
   # This helper method reads reply SMS messages sent to a given phone number after a given message ID.
   # It polls Notify until a new message is found or the timeout is reached.
   # Throws an error if no new message is found within the timeout period.
-  # param phone_number The phone number to read messages for.
+  # param phone_number The phone number connected to the Notify service which receives SMS's.
   # param after_id The message ID to read messages after.
   # param created_after The created_at timestamp of the message with after_id, to ensure we only consider messages created after this time, supposed to be a string, but Ruby is 'helpfully' passing Time objects in some cases, ugh!!
   # param timeout The maximum time to wait for a new message, in seconds. Default is 600 seconds (10 minutes).
@@ -38,7 +40,7 @@ module NotifySms
       end
     rescue Timeout::Error
       last_message = get_latest_sms(phone_number: normalised_phone_number)
-      warn "\n\tTimeout waiting for signup SMS for #{normalised_phone_number}. after_id=#{after_id}, created_after=#{created_after}, last_received_id=#{last_message&.id}, last_received_at #{last_message&.created_at}, last_received_content=#{last_message&.content&.lines&.first&.strip}"
+      warn "\n\tTimeout waiting for #{message_type} SMS for #{normalised_phone_number}. after_id=#{after_id}, created_after=#{created_after}, last_received_id=#{last_message&.id}, last_received_at #{last_message&.created_at}, last_received_content=#{last_message&.content&.lines&.first&.strip}"
       # Re-raise as Timeout::Error so callers/tests can rely on timeout exceptions
       raise Timeout::Error, "No signup SMS found for #{normalised_phone_number} after id #{after_id} at #{created_after}"
     end
@@ -96,6 +98,8 @@ module NotifySms
     [match[:username], match[:password]]
   end
 
+  ## Helper method to normalise phone numbers, removing '+' and converting leading '0' to '44'.
+  ## This ensures consistent formatting for comparison.
   def normalise(phone_number:)
     phone_number.delete("+").sub(/^0/, "44")
   end

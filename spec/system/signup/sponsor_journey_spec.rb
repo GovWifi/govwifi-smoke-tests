@@ -11,18 +11,18 @@ feature "Sponsor Journey" do
     @notify_address = "#{ENV['NOTIFY_FIELD']}@notifications.service.gov.uk"
     @sponsored_email_address = from_address.sub "@", "+sponsored@"
     @sponsor_email_address = from_address
-    @sponsored_sms_number = ENV["SMOKETEST_PHONE_NUMBER"]
-    @govwifi_sms_number = ENV["GOVWIFI_PHONE_NUMBER"]
+    @govwifi_notify_sms_number = ENV["GOVWIFI_PHONE_NUMBER"]
+    @smoketest_user_sms_number = ENV["SMOKETEST_PHONE_NUMBER"]
     @body =
       <<~BODY
         Could I please sign up the following users to GovWifi?
               #{@sponsored_email_address}
         And
-              #{@sponsored_sms_number}
+              #{@smoketest_user_sms_number}
         Thanks
       BODY
 
-    remove_user(user: @sponsored_sms_number)
+    @user_was_removed = remove_user(user: @smoketest_user_sms_number)
     remove_user(user: @sponsored_email_address)
     sleep 5 ## ensure messages have different timestamps
     @sponsored_query = "from:#{@notify_address} subject:Welcome is:unread to:#{@sponsored_email_address}"
@@ -32,8 +32,13 @@ feature "Sponsor Journey" do
   end
   describe "Validate preconditions" do
     it "should receive user removed sms" do
+      unless @user_was_removed
+        # If the user wasn't found/removed, we skip this part of the test.
+        # This is ideal if the test assumes a clean slate.
+        skip "User '#{@smoketest_user_sms_number}' not found for removal. Skipping removal SMS check."
+      end
       ## check that the next message is the removal message.
-      @sms_message = read_reply_sms(phone_number: @govwifi_sms_number, after_id: nil, created_after: nil, message_type: :deleted)
+      @sms_message = read_reply_sms(phone_number: @govwifi_notify_sms_number, after_id: nil, created_after: nil, message_type: :deleted)
       expect(@sms_message).to include("Your GovWifi username and password has been removed.")
     end
     it "has removed any smoke test users" do
@@ -43,7 +48,7 @@ feature "Sponsor Journey" do
       fill_in "Username, email address or phone number", with: @sponsored_email_address
       click_button "Find user details"
       expect(page).to have_content("Nothing found")
-      fill_in "Username, email address or phone number", with: @sponsored_sms_number
+      fill_in "Username, email address or phone number", with: @smoketest_user_sms_number
       click_button "Find user details"
       expect(page).to have_content("Nothing found")
     end
@@ -54,7 +59,7 @@ feature "Sponsor Journey" do
   end
   describe "Signing up" do
     before :context do
-      latest_sms_message = get_latest_sms(phone_number: @govwifi_sms_number)
+      latest_sms_message = get_latest_sms(phone_number: @govwifi_notify_sms_number)
       latest_sms_message_id = latest_sms_message&.id
       latest_sms_message_created_at = latest_sms_message&.created_at
 
@@ -62,7 +67,7 @@ feature "Sponsor Journey" do
 
       @email_message = fetch_reply(query: @sponsored_query)
       @sponsor_email_message = fetch_reply(query: @sponsor_query)
-      @sms_message = read_reply_sms(phone_number: @govwifi_sms_number, after_id: latest_sms_message_id, created_after: latest_sms_message_created_at)
+      @sms_message = read_reply_sms(phone_number: @govwifi_notify_sms_number, after_id: latest_sms_message_id, created_after: latest_sms_message_created_at)
 
       @email_username, @email_password = parse_email_message(message: @email_message)
       @sms_username, @sms_password = parse_sms_message(message: @sms_message)
@@ -77,7 +82,7 @@ feature "Sponsor Journey" do
     end
     it "includes the all sponsored users in the receipt email" do
       expect(@sponsor_email_message.payload.parts.first.body.data).to include(@sponsored_email_address)
-      expect(@sponsor_email_message.payload.parts.first.body.data).to include(normalise(phone_number: @sponsored_sms_number))
+      expect(@sponsor_email_message.payload.parts.first.body.data).to include(normalise(phone_number: @smoketest_user_sms_number))
     end
     describe "connect to FreeRadius" do
       let(:radius_ips) { [ENV["RADIUS_IPS"].split(",").first] }
