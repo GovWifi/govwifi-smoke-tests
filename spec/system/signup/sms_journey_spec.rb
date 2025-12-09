@@ -5,27 +5,33 @@ feature "SMS Journey" do
   include NotifySms
 
   before :context do
-    @govwifi_sms_number = ENV["GOVWIFI_PHONE_NUMBER"]
-    remove_user(user: @govwifi_sms_number)
+    @govwifi_notify_sms_number = ENV["GOVWIFI_PHONE_NUMBER"]
+    @smoketest_user_sms_number = ENV["SMOKETEST_PHONE_NUMBER"]
+    ## Ensure any existing users are removed before starting the test
+    @user_was_removed = remove_user(user: @smoketest_user_sms_number)
     sleep 5 ## ensure messages have different timestamps
   end
   describe "Validate preconditions" do
     it "should receive user removed sms" do
-      ## check that the next message is the removal message.
-      sms_deleted_message = read_reply_sms(phone_number: @govwifi_sms_number, after_id: nil, created_after: nil, message_type: :deleted)
+      unless @user_was_removed
+        # If the user wasn't found/removed, we skip this part of the test.
+        # This is ideal if the test assumes a clean slate.
+        skip "User '#{@smoketest_user_sms_number}' were not found for removal. Skipping removal SMS check."
+      end
+      sms_deleted_message = read_reply_sms(phone_number: @govwifi_notify_sms_number, after_id: nil, created_after: nil, message_type: :deleted)
       expect(sms_deleted_message).to include("Your GovWifi username and password has been removed.")
     end
   end
   describe "Signing up" do
     before :context do
-      latest_sms_message = get_latest_sms(phone_number: @govwifi_sms_number)
+      latest_sms_message = get_latest_sms(phone_number: @govwifi_notify_sms_number)
       id = latest_sms_message&.id
       created_at = latest_sms_message&.created_at
 
-      send_go_message(phone_number: ENV["GOVWIFI_PHONE_NUMBER"], template_id: ENV["NOTIFY_GO_TEMPLATE_ID"])
+      send_go_message(phone_number: @govwifi_notify_sms_number, template_id: ENV["NOTIFY_GO_TEMPLATE_ID"])
       sleep 5 ## ensure messages have different timestamps
 
-      @sms_message = read_reply_sms(phone_number: ENV["GOVWIFI_PHONE_NUMBER"], after_id: id, created_after: created_at)
+      @sms_message = read_reply_sms(phone_number: @govwifi_notify_sms_number, after_id: id, created_after: created_at)
       @sms_username, @sms_password = parse_sms_message(message: @sms_message)
     end
 

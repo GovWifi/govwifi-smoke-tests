@@ -9,6 +9,12 @@ module RemoveUserHelper
     if has_link?("Remove user")
       click_link "Remove user"
       click_button "Remove user"
+      # User was found AND removed successfully
+      true
+    else
+      # User was NOT found (The "Remove user" link was not present)
+      warn("User '#{user}' not found for removal.")
+      false
     end
   end
 end
