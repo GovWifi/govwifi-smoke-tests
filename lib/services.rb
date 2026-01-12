@@ -5,7 +5,18 @@ require_relative "./env_token_store"
 
 module Services
   def self.notify
-    @notify ||= Notifications::Client.new(ENV["NOTIFY_SMOKETEST_API_KEY"])
+    # Default to the internal Docker URL if the var is missing to avoid hitting production
+    base_url = ENV.fetch("NOTIFY_API_URL", "http://notify-pit:8000")
+
+    @notify ||= Notifications::Client.new(
+      ENV["NOTIFY_SMOKETEST_API_KEY"],
+      base_url: base_url
+    )
+  end
+
+  # Helper to access the mock service directly for retrieval (needed for emails)
+  def self.notify_pit_url
+    ENV.fetch("NOTIFY_API_URL", "http://notify-pit:8000")
   end
 
   def self.gmail

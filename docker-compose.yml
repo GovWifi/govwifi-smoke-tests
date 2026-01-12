@@ -1,7 +1,20 @@
-
 services:
   app:
     build:
       context: .
       args:
         BUNDLE_INSTALL_FLAGS: "${BUNDLE_INSTALL_FLAGS:- --jobs 20 --retry 5}"
+    environment:
+      - NOTIFY_API_URL=http://notify-pit:8000
+      - USE_NOTIFY_PIT=false
+      # Use the key corresponding to the secret in your mock service
+      # Format: key_name-service_id-secret
+      - NOTIFY_SMOKETEST_API_KEY=test-26785a09-ab16-4eb0-8407-a37497a57506-3d844edf-8d35-48ac-975b-e847b4f122b0
+    depends_on:
+      - notify-pit
+
+  notify-pit:
+    # Build from the 'notify_pit' subdirectory of the remote repository
+    build: https://github.com/GovWifi/notify-pit.git#main:notify_pit
+    ports:
+      - "8000:8000"
