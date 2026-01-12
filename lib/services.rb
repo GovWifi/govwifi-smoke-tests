@@ -5,16 +5,25 @@ require_relative "./env_token_store"
 
 module Services
   def self.notify
-    # Default to the internal Docker URL if the var is missing to avoid hitting production
-    base_url = ENV.fetch("NOTIFY_API_URL", "http://notify-pit:8000")
+    # Logic to determine which URL to use:
+    # 1. If USE_NOTIFY_PIT is true, use the Env Var or default to the internal Docker URL.
+    # 2. If USE_NOTIFY_PIT is false, force nil (Production) to ignore the docker-compose default.
+    base_url = if ENV["USE_NOTIFY_PIT"] == "true"
+                 ENV.fetch("NOTIFY_API_URL", "http://notify-pit:8000")
+               else
+                 nil
+               end
 
-    @notify ||= Notifications::Client.new(
-      ENV["NOTIFY_SMOKETEST_API_KEY"],
-      base_url: base_url
-    )
+    @notify ||= if base_url
+                  # FIX: Pass base_url as a positional argument, not keyword (base_url: ...)
+                  Notifications::Client.new(ENV["NOTIFY_SMOKETEST_API_KEY"], base_url)
+                else
+                  # If no base_url, the client defaults to the real production API
+                  Notifications::Client.new(ENV["NOTIFY_SMOKETEST_API_KEY"])
+                end
   end
 
-  # Helper to access the mock service directly for retrieval (needed for emails)
+  # Helper to access the mock service directly for retrieval (still needed for emails)
   def self.notify_pit_url
     ENV.fetch("NOTIFY_API_URL", "http://notify-pit:8000")
   end
