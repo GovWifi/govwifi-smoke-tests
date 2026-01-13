@@ -65,6 +65,16 @@ These are located in the govwifi-terraform repo
 - `SMOKETEST_PHONE_NUMBER` - located in the 'smoke_tests' module, in locals for each environment.
 - `NOTIFY_FIELD` - located in the 'smoke_tests' module for each environment.
 
+
+## Notify Mocking
+We now have a service called Notify_Pit (Notify Point in Time)
+This mocks the Notify API and returns calls mimicking that API
+This allows for more rapid testing
+Its enabled as default, to use the real api set this variable
+```
+export NOTIFY_BASE_URL=https://api.notifications.service.gov.uk
+```
+
 Then run the tests:
 ```make test```
 

@@ -5,3 +5,19 @@ services:
       context: .
       args:
         BUNDLE_INSTALL_FLAGS: "${BUNDLE_INSTALL_FLAGS:- --jobs 20 --retry 5}"
+    environment:
+      - RACK_ENV=test
+      - NOTIFY_BASE_URL=${NOTIFY_BASE_URL:-http://notifypit:4567} # use notifypit as default unless NOTIfY_BASE_URL is set
+    depends_on:
+      notifypit:
+        condition: service_healthy
+
+  notifypit:
+    build: https://github.com/GovWifi/notify-pit.git#main
+    ports:
+      - "4567:4567"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4567/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
