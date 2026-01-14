@@ -5,6 +5,7 @@ require_relative "./env_token_store"
 
 module Services
   def self.notify
+    puts" Using Notify Base URL: #{ENV["NOTIFY_BASE_URL"]}"
     @notify ||= Notifications::Client.new(
       ENV["NOTIFY_SMOKETEST_API_KEY"],
       ENV["NOTIFY_BASE_URL"])
