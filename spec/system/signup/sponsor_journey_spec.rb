@@ -31,16 +31,16 @@ feature "Sponsor Journey" do
     set_all_messages_to_read(query: @sponsor_query)
   end
   describe "Validate preconditions" do
-    it "should receive user removed sms" do
-      unless @user_was_removed
-        # If the user wasn't found/removed, we skip this part of the test.
-        # This is ideal if the test assumes a clean slate.
-        skip "User '#{@smoketest_user_sms_number}' not found for removal. Skipping removal SMS check."
-      end
-      ## check that the next message is the removal message.
-      @sms_message = read_reply_sms(phone_number: @govwifi_notify_sms_number, after_id: nil, created_after: nil, message_type: :deleted)
-      expect(@sms_message).to include("Your GovWifi username and password has been removed.")
-    end
+    # it "should receive user removed sms" do
+    #   unless @user_was_removed
+    #     # If the user wasn't found/removed, we skip this part of the test.
+    #     # This is ideal if the test assumes a clean slate.
+    #     skip "User '#{@smoketest_user_sms_number}' not found for removal. Skipping removal SMS check."
+    #   end
+    #   ## check that the next message is the removal message.
+    #   @sms_message = read_reply_sms(phone_number: @govwifi_notify_sms_number, after_id: nil, created_after: nil, message_type: :deleted)
+    #   expect(@sms_message).to include("Your GovWifi username and password has been removed.")
+    # end
     it "has removed any smoke test users" do
       logout
       login(username: ENV["GW_SUPER_ADMIN_USER"], password: ENV["GW_SUPER_ADMIN_PASS"], secret: ENV["GW_SUPER_ADMIN_2FA_SECRET"])

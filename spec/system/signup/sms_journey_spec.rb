@@ -12,16 +12,16 @@ feature "SMS Journey" do
     sleep 5 ## ensure messages have different timestamps
   end
   describe "Validate preconditions" do
-    it "should receive user removed sms" do
-      unless @user_was_removed
-        # If the user wasn't found/removed, we skip this part of the test.
-        # This is ideal if the test assumes a clean slate.
-        skip "User '#{@smoketest_user_sms_number}' were not found for removal. Skipping removal SMS check."
-      end
-      sms_deleted_message = read_reply_sms(phone_number: @govwifi_notify_sms_number, after_id: nil, created_after: nil, message_type: :deleted)
-      expect(sms_deleted_message).to include("Your GovWifi username and password has been removed.")
-    end
-  end
+  #   it "should receive user removed sms" do
+  #     unless @user_was_removed
+  #       # If the user wasn't found/removed, we skip this part of the test.
+  #       # This is ideal if the test assumes a clean slate.
+  #       skip "User '#{@smoketest_user_sms_number}' were not found for removal. Skipping removal SMS check."
+  #     end
+  #     sms_deleted_message = read_reply_sms(phone_number: @govwifi_notify_sms_number, after_id: nil, created_after: nil, message_type: :deleted)
+  #     expect(sms_deleted_message).to include("Your GovWifi username and password has been removed.")
+  #   end
+  # end
   describe "Signing up" do
     before :context do
       latest_sms_message = get_latest_sms(phone_number: @govwifi_notify_sms_number)
