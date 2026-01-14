@@ -21,7 +21,7 @@ feature "SMS Journey" do
   #     sms_deleted_message = read_reply_sms(phone_number: @govwifi_notify_sms_number, after_id: nil, created_after: nil, message_type: :deleted)
   #     expect(sms_deleted_message).to include("Your GovWifi username and password has been removed.")
   #   end
-  # end
+  end
   describe "Signing up" do
     before :context do
       latest_sms_message = get_latest_sms(phone_number: @govwifi_notify_sms_number)
