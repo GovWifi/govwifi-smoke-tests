@@ -7,7 +7,7 @@ module Services
   def self.notify
     # Force the mock URL and use a dummy key format that the gem accepts
     base_url = ENV['NOTIFY_BASE_URL'] || "http://notifypit:4567"
-    api_key  = "mock_key-00000000-0000-0000-0000-000000000000"
+    api_key = "mock_key-00000000-0000-0000-0000-000000000000-11111111-1111-1111-1111-111111111111"
 
     @notify ||= Notifications::Client.new(api_key, base_url)
   end
