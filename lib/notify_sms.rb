@@ -3,11 +3,29 @@ require_relative "services"
 module NotifySms
   ## This helper method sends a "GO" message to a given phone number using the specified Notify template ID.
   ## The phone number of the text message recipient. This can be a UK or international number, in E.164 format (e.g., +447700900123), must include +44 country code for UK numbers.
-  def send_go_message(phone_number:, template_id:)
-    Services.notify.send_sms(
-      phone_number:,
-      template_id:,
-    )
+def send_go_message(phone_number:, template_id:)
+    puts "\n" + ("-" * 40)
+    puts "📨 ATTEMPTING TO SEND SMS"
+    puts "   To: #{phone_number}"
+
+    # Check exactly what the client thinks it is doing
+    client = Services.notify
+    puts "   Client Base URL: #{client.instance_variable_get(:@base_url)}"
+
+    begin
+      # Attempt the send
+      response = client.send_sms(
+        phone_number: phone_number,
+        template_id: template_id
+      )
+      puts "✅ CLIENT SUCCESS: SMS Sent! (Message ID: #{response.id})"
+    rescue => e
+      # Capture ANY failure - this is likely where our problem is hiding
+      puts "❌ CLIENT FAILURE: #{e.class}"
+      puts "   Error Message: #{e.message}"
+      puts "   Backtrace: #{e.backtrace.first}"
+    end
+    puts ("-" * 40) + "\n"
   end
 
   # This helper method reads reply SMS messages sent to a given phone number after a given message ID.
