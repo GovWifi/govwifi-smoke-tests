@@ -21,33 +21,9 @@ RSpec.configure do |config|
 
   config.before(:suite) do
     if ENV['NOTIFY_BASE_URL']
-      puts "\n" + ("=" * 50)
-      puts "🔌 NETWORK CONNECTIVITY CHECK"
-      puts "Target: #{ENV['NOTIFY_BASE_URL']}"
-
-      begin
-        # 1. Parse the URL
-        uri = URI("#{ENV['NOTIFY_BASE_URL']}/health")
-
-        # 2. Attempt a real connection (Timeout after 2 seconds)
-        res = Net::HTTP.get_response(uri)
-
-        if res.is_a?(Net::HTTPSuccess)
-          puts "✅ SUCCESS: Connected to Mock! (Status: #{res.code})"
-        else
-          puts "❌ FAILURE: Connected, but got Status #{res.code}"
-          puts "Response: #{res.body}"
-        end
-      rescue SocketError => e
-        puts "❌ DNS ERROR: Could not resolve 'notifypit'. Is the Docker network attached?"
-        puts "Error: #{e.message}"
-      rescue Errno::ECONNREFUSED => e
-        puts "❌ CONNECTION REFUSED: 'notifypit' is reachable, but nothing is listening on port 4567."
-      rescue => e
-        puts "❌ NETWORK ERROR: #{e.message}"
-        puts "Backtrace: #{e.backtrace.first}"
-      end
-      puts "=" * 50 + "\n"
+      puts "\n🚀 BOOTING IN MOCK MODE (Target: #{ENV['NOTIFY_BASE_URL']})"
+    else
+      puts "\n☁️ BOOTING IN PRODUCTION MODE"
     end
   end
 end
