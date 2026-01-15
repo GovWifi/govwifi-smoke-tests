@@ -22,22 +22,33 @@ RSpec.configure do |config|
   config.before(:suite) do
     begin
       if ENV['NOTIFY_BASE_URL']
-        client = Services.notify
-        target = client.instance_variable_get(:@base_url)
+      puts "\n" + ("=" * 50)
+      puts "🔌 NETWORK CONNECTIVITY CHECK"
+      puts "Target: #{ENV['NOTIFY_BASE_URL']}"
 
-        puts "\n" + ("=" * 40)
-        puts "🚦 TRAFFIC CONTROLLER DIAGNOSTIC"
-        puts "Targeting: #{target || 'PRODUCTION'}"
-        puts "=" * 40 + "\n"
+      begin
+        # 1. Parse the URL
+        uri = URI("#{ENV['NOTIFY_BASE_URL']}/health")
 
-        if target.to_s.include?("notifypit")
-          puts "✅ SUCCESS: Mock Services loaded."
+        # 2. Attempt a real connection (Timeout after 2 seconds)
+        res = Net::HTTP.get_response(uri)
+
+        if res.is_a?(Net::HTTPSuccess)
+          puts "✅ SUCCESS: Connected to Mock! (Status: #{res.code})"
         else
-          puts "❌ ERROR: Production Services loaded despite MOCK environment!"
+          puts "❌ FAILURE: Connected, but got Status #{res.code}"
+          puts "Response: #{res.body}"
         end
+      rescue SocketError => e
+        puts "❌ DNS ERROR: Could not resolve 'notifypit'. Is the Docker network attached?"
+        puts "Error: #{e.message}"
+      rescue Errno::ECONNREFUSED => e
+        puts "❌ CONNECTION REFUSED: 'notifypit' is reachable, but nothing is listening on port 4567."
+      rescue => e
+        puts "❌ NETWORK ERROR: #{e.message}"
+        puts "Backtrace: #{e.backtrace.first}"
       end
-    rescue => e
-      puts "❌ DIAGNOSTIC CRASHED: #{e.message}"
+      puts "=" * 50 + "\n"
     end
   end
 end
