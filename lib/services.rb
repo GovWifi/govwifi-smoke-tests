@@ -6,21 +6,25 @@ require_relative "./env_token_store"
 module Services
   def self.notify
     if ENV['NOTIFY_BASE_URL'] && !ENV['NOTIFY_BASE_URL'].to_s.empty?
-      env_url = ENV['NOTIFY_BASE_URL']
-      clean_url = env_url.to_s.strip.chomp('/')
-      fake_key  = "mock_key-00000000-0000-0000-0000-000000000000-11111111-1111-1111-1111-111111111111"
+# 1. Prepare the variables
+      url = ENV['NOTIFY_BASE_URL'].to_s.strip.chomp('/')
+      # We use the double-UUID key to satisfy the gem's regex validation
+      key = "mock_key-00000000-0000-0000-0000-000000000000-11111111-1111-1111-1111-111111111111"
 
-      puts "\n--- [Services.rb] INITIALIZING MOCK ---"
-      puts "URL passed to Gem: '#{clean_url}'"
-      puts "Key passed to Gem: '#{fake_key}'"
+      # 2. Initialize the client (even if it ignores the URL arg, we fix it below)
+      @mock_client ||= Notifications::Client.new(key, url)
 
-      # 3. Create the client
-      @mock_client ||= Notifications::Client.new(fake_key, clean_url)
+      # 3. --- BRUTE FORCE FIX ---
+      # Since the log proved the gem is ignoring the constructor argument,
+      # we manually force the instance variable to be set.
+      @mock_client.instance_variable_set(:@base_url, url)
 
-      # 4. DEBUG: Check if it stuck
-      actual_url = @mock_client.instance_variable_get(:@base_url)
-      puts "Resulting Client URL: '#{actual_url}'"
-      puts "---------------------------------------\n"
+      # 4. --- DOUBLE LOCK ---
+      # We also override the method on this specific object to guarantee
+      # it returns our URL, just in case the gem uses the method instead of the variable.
+      def @mock_client.base_url
+        ENV['NOTIFY_BASE_URL'].to_s.strip.chomp('/')
+      end
 
       return @mock_client
     else
