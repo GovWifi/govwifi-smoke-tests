@@ -2,6 +2,7 @@ require "capybara/rspec"
 require "govwifi_eapoltest"
 require "rotp"
 
+# 1. Load all files in lib (this triggers our Traffic Controller in services.rb)
 Dir["../lib/*"].each { |f| require f }
 Dir["./spec/support/*"].each { |f| require f }
 Dir["./spec/system/*/shared_context.rb"].sort.each { |f| require f }
@@ -9,6 +10,7 @@ Dir["./spec/system/*/shared_context.rb"].sort.each { |f| require f }
 RSpec.configure do |config|
   config.filter_run focus: true
   config.run_all_when_everything_filtered = true
+
   config.expect_with :rspec do |expectations|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
   end
@@ -19,23 +21,20 @@ RSpec.configure do |config|
 
   config.before(:suite) do
     begin
-      client = Services.notify
-      internal_url = client.instance_variable_get(:@base_url)
-      service_id = client.instance_variable_get(:@service_id)
+      if ENV['NOTIFY_BASE_URL']
+        client = Services.notify
+        target = client.instance_variable_get(:@base_url)
 
-      puts "\n" + ("=" * 60)
-      puts "🔍 NOTIFY CLIENT INSPECTION"
-      puts "ENV URL:         #{ENV['NOTIFY_BASE_URL'].inspect}"
-      puts "Internal Target: #{internal_url.inspect}"
-      puts "Service ID:      #{service_id.inspect}"
-      puts "=" * 60 + "\n"
+        puts "\n" + ("=" * 40)
+        puts "🚦 TRAFFIC CONTROLLER DIAGNOSTIC"
+        puts "Targeting: #{target || 'PRODUCTION'}"
+        puts "=" * 40 + "\n"
 
-      if internal_url.to_s.empty?
-        puts "❌ ERROR: Client is NOT storing the base URL."
-      elsif internal_url.to_s.include?("api.notifications.service.gov.uk")
-        puts "❌ ERROR: Client is pointing to PRODUCTION."
-      else
-        puts "✅ SUCCESS: Client is configured for Mock."
+        if target.to_s.include?("notifypit")
+          puts "✅ SUCCESS: Mock Services loaded."
+        else
+          puts "❌ ERROR: Production Services loaded despite MOCK environment!"
+        end
       end
     rescue => e
       puts "❌ DIAGNOSTIC CRASHED: #{e.message}"
