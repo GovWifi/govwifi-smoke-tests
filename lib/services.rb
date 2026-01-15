@@ -1,6 +1,6 @@
 ## used to switch between different services implementations
 # lib/services.rb
-if !ENV['NOTIFY_BASE_URL'].to_s.empty?
+if ENV['NOTIFY_BASE_URL'] && !ENV['NOTIFY_BASE_URL'].empty?
   # Load the mock implementation
   require_relative 'mock_service'
   puts "🛠️ LOADING MOCK SERVICES"

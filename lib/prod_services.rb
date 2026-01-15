@@ -5,7 +5,7 @@ require_relative "./env_token_store"
 
 module Services
   def self.notify
-    @notify ||= Notifications::Client.new(ENV["NOTIFY_SMOKETEST_API_KEY"])
+    @prod_notify ||= Notifications::Client.new(ENV["NOTIFY_SMOKETEST_API_KEY"])
   end
 
   def self.gmail

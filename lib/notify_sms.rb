@@ -1,4 +1,4 @@
-require_relative "../lib/services"
+require_relative "services"
 
 module NotifySms
   ## This helper method sends a "GO" message to a given phone number using the specified Notify template ID.
