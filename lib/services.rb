@@ -6,12 +6,23 @@ require_relative "./env_token_store"
 module Services
   def self.notify
     if ENV['NOTIFY_BASE_URL'] && !ENV['NOTIFY_BASE_URL'].to_s.empty?
-      # --- MOCK LOGIC ---
-      url = ENV['NOTIFY_BASE_URL'].to_s.strip.chomp('/')
-      # Double-UUID key to satisfy the gem's internal validation
-      key = "mock_key-00000000-0000-0000-0000-000000000000-11111111-1111-1111-1111-111111111111"
-      puts "Using MOCK Notify service at #{url}"
-      @mock_client ||= Notifications::Client.new(key, url)
+      env_url = ENV['NOTIFY_BASE_URL']
+      clean_url = env_url.to_s.strip.chomp('/')
+      fake_key  = "mock_key-00000000-0000-0000-0000-000000000000-11111111-1111-1111-1111-111111111111"
+
+      puts "\n--- [Services.rb] INITIALIZING MOCK ---"
+      puts "URL passed to Gem: '#{clean_url}'"
+      puts "Key passed to Gem: '#{fake_key}'"
+
+      # 3. Create the client
+      @mock_client ||= Notifications::Client.new(fake_key, clean_url)
+
+      # 4. DEBUG: Check if it stuck
+      actual_url = @mock_client.instance_variable_get(:@base_url)
+      puts "Resulting Client URL: '#{actual_url}'"
+      puts "---------------------------------------\n"
+
+      return @mock_client
     else
       # --- PROD LOGIC ---
       puts "Using PROD Notify service"
