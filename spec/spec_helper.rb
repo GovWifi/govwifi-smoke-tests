@@ -20,8 +20,7 @@ RSpec.configure do |config|
   config.include RemoveUserHelper
 
   config.before(:suite) do
-    begin
-      if ENV['NOTIFY_BASE_URL']
+    if ENV['NOTIFY_BASE_URL']
       puts "\n" + ("=" * 50)
       puts "🔌 NETWORK CONNECTIVITY CHECK"
       puts "Target: #{ENV['NOTIFY_BASE_URL']}"
