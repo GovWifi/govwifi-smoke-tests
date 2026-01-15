@@ -25,7 +25,8 @@ module Services
       def @mock_client.base_url
         ENV['NOTIFY_BASE_URL'].to_s.strip.chomp('/')
       end
-
+      puts "Using MOCK Notify service at #{@mock_client.base_url}"
+      puts "Cehcking client base_url: #{ @mock_client.instance_variable_get(:@base_url) }"
       return @mock_client
     else
       # --- PROD LOGIC ---
