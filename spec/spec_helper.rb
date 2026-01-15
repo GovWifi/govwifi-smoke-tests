@@ -19,26 +19,26 @@ RSpec.configure do |config|
 
   config.before(:suite) do
     begin
-      # This calls the method in your lib/services.rb
       client = Services.notify
-
-      # Reach inside the Notifications::Client object to see its target URL
-      # This is the "backdoor" we discussed to see the hidden @base_url
-      actual_url = client.instance_variable_get(:@base_url)
+      internal_url = client.instance_variable_get(:@base_url)
+      service_id = client.instance_variable_get(:@service_id)
 
       puts "\n" + ("=" * 60)
-      puts "🚨 NOTIFY MOCK DIAGNOSTIC 🚨"
-      puts "1. Environment Variable (NOTIFY_BASE_URL): '#{ENV['NOTIFY_BASE_URL']}'"
-      puts "2. Client Internal Target:                '#{actual_url}'"
+      puts "🔍 NOTIFY CLIENT INSPECTION"
+      puts "ENV URL:         #{ENV['NOTIFY_BASE_URL'].inspect}"
+      puts "Internal Target: #{internal_url.inspect}"
+      puts "Service ID:      #{service_id.inspect}"
       puts "=" * 60 + "\n"
 
-      if actual_url.to_s.include?("api.notifications.service.gov.uk")
-        puts "❌ ERROR: Client is still hitting PRODUCTION!"
+      if internal_url.to_s.empty?
+        puts "❌ ERROR: Client is NOT storing the base URL."
+      elsif internal_url.to_s.include?("api.notifications.service.gov.uk")
+        puts "❌ ERROR: Client is pointing to PRODUCTION."
       else
-        puts "✅ SUCCESS: Client is pointing to the MOCK."
+        puts "✅ SUCCESS: Client is configured for Mock."
       end
     rescue => e
-      puts "❌ DIAGNOSTIC FAILED: #{e.message}"
+      puts "❌ DIAGNOSTIC CRASHED: #{e.message}"
     end
   end
 end
