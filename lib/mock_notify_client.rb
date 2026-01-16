@@ -71,8 +71,8 @@ class MockNotifyClient
   end
 
   def _get(path)
-    puts "   GET URL:  #{uri}"
     uri = URI("#{@base_url}#{path}")
+    puts "   GET URL:  #{uri}"
     req = Net::HTTP::Get.new(uri)
     req['Authorization'] = "Bearer #{@api_key}"
     req['Content-Type']  = "application/json"
