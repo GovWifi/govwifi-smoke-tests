@@ -35,10 +35,16 @@ class MockNotifyClient
     # 2. Extract the list (NotifyPit returns { "received_text_messages": [...] })
     # If the key is missing, default to empty array
     list = data["received_text_messages"] || []
-
+    puts "   Retrieved #{list.size} received text messages."
     # 3. Wrap in OpenStruct to mimic the Gem's response object
     # The real gem returns an object where .collection is the array
     collection = list.map { |item| OpenStruct.new(item) }
+    puts "   Returning collection with #{collection.size} messages."
+    if collection.size > 0
+      collection.each do |msg|
+        puts "   Message ID: #{msg.id}, Content: #{msg.content}"
+      end
+    end
     OpenStruct.new(collection: collection)
   end
 
