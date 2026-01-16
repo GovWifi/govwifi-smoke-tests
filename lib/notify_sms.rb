@@ -4,6 +4,7 @@ module NotifySms
   ## This helper method sends a "GO" message to a given phone number using the specified Notify template ID.
   ## The phone number of the text message recipient. This can be a UK or international number, in E.164 format (e.g., +447700900123), must include +44 country code for UK numbers.
   def send_go_message(phone_number:, template_id:)
+    puts "\n🐛 DEBUG: Entered send_go_message. Target: #{phone_number}"
     Services.notify.send_sms(
       phone_number:,
       template_id:,
