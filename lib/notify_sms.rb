@@ -20,7 +20,7 @@ module NotifySms
   # param timeout The maximum time to wait for a new message, in seconds. Default is 600 seconds (10 minutes).
   # param interval The interval between polling attempts, in seconds. Default is 5 seconds.
   # return The content of the latest new message found.
-  def read_reply_sms(phone_number:, after_id:, created_after:, message_type: :signup, timeout: 600, interval: 5)
+  def read_reply_sms(phone_number:, after_id:, created_after:, message_type: :signup, timeout: 30, interval: 5)
     normalised_phone_number = normalise(phone_number:)
     begin
       Timeout.timeout(timeout, nil, "Waited too long for signup SMS. Last received SMS is #{after_id} at #{created_after}") do

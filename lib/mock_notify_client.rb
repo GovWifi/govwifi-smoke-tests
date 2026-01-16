@@ -73,6 +73,7 @@ class MockNotifyClient
   def _get(path)
     uri = URI("#{@base_url}#{path}")
     puts "   GET URL:  #{uri}"
+
     req = Net::HTTP::Get.new(uri)
     req['Authorization'] = "Bearer #{@api_key}"
     req['Content-Type']  = "application/json"
@@ -81,13 +82,18 @@ class MockNotifyClient
       http.request(req)
     end
 
+    # --- 🐛 NEW DEBUG LOGGING ---
     puts "   Response: #{response.code} #{response.message}"
+    if response.body && !response.body.empty?
+      puts "   Body: #{response.body}"
+    else
+      puts "   Body: [EMPTY]"
+    end
+    # -----------------------------
 
-    # For GET requests, we return the raw Hash so the caller can extract the specific list key
     if response.is_a?(Net::HTTPSuccess)
       JSON.parse(response.body)
     else
-      # If the endpoint doesn't exist on NotifyPit yet, return empty structure to avoid crashing
       puts "   ⚠️  Empty or error response from Mock."
       {}
     end
