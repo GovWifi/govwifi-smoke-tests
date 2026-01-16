@@ -31,7 +31,7 @@ module NotifySms
             after_time = parse_time_object(created_after)
             message_time = parse_time_object(result.created_at)
             ## uncomment for debugging
-            # puts "\tMessage ID #{result.id} created at #{message_time.iso8601} after id #{after_id} created at #{after_time.iso8601}"
+            puts "\tMessage ID #{result.id} created at #{message_time.iso8601} after id #{after_id} created at #{after_time.iso8601}"
             break if result.id != after_id && message_time > after_time
           end
           print "."
@@ -72,6 +72,7 @@ module NotifySms
   # 2. Contains the parsed text.
   def get_sms_message(phone_number:, message_type:)
     messages = get_all_sms_for_number(phone_number:)
+    puts "\n🐛 DEBUG: get_sms_message found #{messages.size} messages for #{phone_number}"
     return nil unless messages ## return nil if no messages found
 
     messages.find do |message|
@@ -89,7 +90,7 @@ module NotifySms
       result
     rescue StandardError
       ## uncomment for debugging
-      # warn "\tMessage ID #{message&.id} did not match expected format for message_type #{message_type.inspect}, content: #{message&.content&.lines&.first&.strip}"
+      warn "\tMessage ID #{message&.id} did not match expected format for message_type #{message_type.inspect}, content: #{message&.content&.lines&.first&.strip}"
       nil
     end
   end
