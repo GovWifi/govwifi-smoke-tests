@@ -15,7 +15,7 @@ class MockNotifyClient
   def send_sms(phone_number:, template_id:, personalisations: nil, reference: nil)
     payload = {
       phone_number: phone_number,
-      template_id: template_id,
+      template_id: template_id || 'go_template_id',
       personalisation: personalisations,
       reference: reference
     }.compact
