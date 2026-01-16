@@ -20,7 +20,7 @@ class MockNotifyClient
       reference: reference
     }.compact
     puts "\n➡️ [MockClient] SEND SMS"
-    puts "   To: #{phone_number}"
+    puts "   To: #{phone_number} template_id: #{template_id}"
     _post("/v2/notifications/sms", payload)
   end
 
