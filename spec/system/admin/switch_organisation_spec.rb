@@ -11,6 +11,6 @@ feature "Switch Organisation" do
     click_link "Switch organisation"
     click_button "Automated Test 2"
 
-    expect(page).to have_xpath "//div[contains(@class, 'organisation-name')]/strong[text()='Automated Test 2']"
+    expect(page).to have_xpath "//span[contains(@class,'govuk-service-navigation__service-name')]/strong[text()='Automated Test 2']"
   end
 end
