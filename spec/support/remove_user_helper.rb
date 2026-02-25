@@ -1,4 +1,5 @@
 require "logger"
+
 module RemoveUserHelper
   def remove_user(user:)
     logout

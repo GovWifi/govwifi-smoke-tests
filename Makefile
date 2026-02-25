@@ -35,6 +35,9 @@ build:
 lint: build
 	$(DOCKER_COMPOSE) run --rm app bundle exec rubocop
 
+lint-local:
+	bundle exec rubocop -A
+
 test: build
 	$(DOCKER_COMPOSE)  run --rm $(TEST_ENV_VARS) app bundle exec rspec spec/system
 
