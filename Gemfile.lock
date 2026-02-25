@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/GovWifi/govwifi_eapoltest.git
-  revision: 581203b8adfe7d45016e604569346fbed5b5428d
+  revision: 834fd5152beb062f0f2ac1876248b6afcec721d0
   specs:
     govwifi_eapoltest (0.2.1)
       base64 (>= 0.3.0)
@@ -48,7 +48,7 @@ GEM
       faraday-net_http (>= 2.0, < 3.5)
       json
       logger
-    faraday-follow_redirects (0.4.0)
+    faraday-follow_redirects (0.5.0)
       faraday (>= 1, < 3)
     faraday-net_http (3.4.2)
       net-http (~> 0.5)
@@ -66,7 +66,7 @@ GEM
       base64 (~> 0.2)
       faraday (>= 1.0, < 3.a)
     google-logging-utils (0.2.0)
-    googleauth (1.16.0)
+    googleauth (1.16.1)
       faraday (>= 1.0, < 3.a)
       google-cloud-env (~> 2.2)
       google-logging-utils (~> 0.1)
@@ -82,17 +82,14 @@ GEM
     language_server-protocol (3.17.0.5)
     lint_roller (1.1.0)
     logger (1.7.0)
-    matrix (0.4.2)
+    matrix (0.4.3)
     mini_mime (1.1.5)
-    mini_portile2 (2.8.9)
-    minitest (6.0.1)
+    minitest (6.0.2)
+      drb (~> 2.0)
       prism (~> 1.5)
-    multi_json (1.18.0)
+    multi_json (1.19.1)
     net-http (0.9.1)
       uri (>= 0.11.1)
-    nokogiri (1.19.1)
-      mini_portile2 (~> 2.8.2)
-      racc (~> 1.4)
     nokogiri (1.19.1-aarch64-linux-gnu)
       racc (~> 1.4)
     nokogiri (1.19.1-aarch64-linux-musl)
@@ -114,11 +111,11 @@ GEM
     os (1.1.4)
     ostruct (0.6.3)
     parallel (1.27.0)
-    parser (3.3.10.1)
+    parser (3.3.10.2)
       ast (~> 2.4.1)
       racc
     prism (1.9.0)
-    public_suffix (7.0.0)
+    public_suffix (7.0.2)
     racc (1.8.1)
     rack (3.2.5)
     rack-test (2.2.0)
@@ -129,7 +126,7 @@ GEM
       declarative (< 0.1.0)
       trailblazer-option (>= 0.1.1, < 0.2.0)
       uber (< 0.2.0)
-    retriable (3.1.2)
+    retriable (3.2.1)
     rexml (3.4.4)
     rotp (6.3.0)
     rspec (3.13.2)
@@ -144,7 +141,7 @@ GEM
     rspec-mocks (3.13.7)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
-    rspec-support (3.13.6)
+    rspec-support (3.13.7)
     rubocop (1.82.1)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
@@ -184,7 +181,7 @@ GEM
     ruby-progressbar (1.13.0)
     rubyzip (3.2.2)
     securerandom (0.4.1)
-    selenium-webdriver (4.40.0)
+    selenium-webdriver (4.41.0)
       base64 (~> 0.2)
       logger (~> 1.4)
       rexml (~> 3.2, >= 3.2.5)
@@ -213,7 +210,6 @@ PLATFORMS
   arm-linux-gnu
   arm-linux-musl
   arm64-darwin
-  ruby
   x86_64-darwin
   x86_64-linux-gnu
   x86_64-linux-musl
@@ -229,7 +225,7 @@ DEPENDENCIES
   selenium-webdriver
 
 RUBY VERSION
-   ruby 3.4.7p58
+   ruby 4.0.1p0
 
 BUNDLED WITH
    2.6.9
