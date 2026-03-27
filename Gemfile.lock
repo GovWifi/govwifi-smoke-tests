@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/GovWifi/govwifi_eapoltest.git
-  revision: 834fd5152beb062f0f2ac1876248b6afcec721d0
+  revision: 6793ec8ff02f91418cc2ed043760ceb490a92565
   specs:
     govwifi_eapoltest (0.2.1)
       base64 (>= 0.3.0)
@@ -138,7 +138,7 @@ GEM
     rspec-expectations (3.13.5)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
-    rspec-mocks (3.13.7)
+    rspec-mocks (3.13.8)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.7)
