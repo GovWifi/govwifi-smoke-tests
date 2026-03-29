@@ -1,4 +1,4 @@
-FROM ruby:4.0.1-alpine
+FROM ruby:3.4.9-alpine
 ARG BUNDLE_INSTALL_CMD
 
 ENV \
