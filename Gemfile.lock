@@ -225,7 +225,7 @@ DEPENDENCIES
   selenium-webdriver
 
 RUBY VERSION
-   ruby 4.0.1p0
+   ruby 3.4.9p82
 
 BUNDLED WITH
    2.6.9
