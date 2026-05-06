@@ -12,7 +12,8 @@ env:
 jobs:
   check-ruby-setup:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: write
     outputs:
       TARGET_RUBY_VERSION: ${{ steps.check-ruby.outputs.TARGET_RUBY_VERSION }}
       NEW_RUBY: ${{ steps.check-ruby.outputs.NEW_RUBY }}
