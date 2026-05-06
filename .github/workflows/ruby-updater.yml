@@ -7,7 +7,7 @@ on:
 
 env:
   MAIN_BRANCH: 'main'
-  MAJOR_VERSION: 4
+  MAJOR_VERSION: '4'
 
 jobs:
   check-ruby-setup:
@@ -27,7 +27,7 @@ jobs:
       id: check-ruby
       uses: govwifi/shared-actions-workflows/.github/actions/ruby-version-check@main
       with:
-        major-version: $MAJOR_VERSION
+        major-version: ${{ env.MAJOR_VERSION }}
 
     - name: Setup github branch for Ruby Updates
       id: setup-branch
@@ -68,4 +68,4 @@ jobs:
       if: ${{ env.NEW_RUBY == 'true' }}
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        main-branch: $MAIN_BRANCH
+        main-branch: ${{ env.MAIN_BRANCH }}
