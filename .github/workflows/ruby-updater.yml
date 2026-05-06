@@ -23,7 +23,8 @@ jobs:
 
     - name: Check out code
       uses: actions/checkout@v4
-
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
     - name: Check Ruby Version
       id: check-ruby
       uses: govwifi/shared-actions-workflows/.github/actions/ruby-version-check@main
@@ -48,6 +49,8 @@ jobs:
 
     - name: Check out code
       uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Update Ruby Version
       env:
