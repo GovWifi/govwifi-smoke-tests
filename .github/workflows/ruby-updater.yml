@@ -5,10 +5,6 @@ on:
   schedule:
     - cron: "25 2 15 * 0" # Runs monthly (in the middle to avoid any date clashes)
 
-permissions:
-  contents: write
-  pull-requests: write
-
 env:
   MAIN_BRANCH: 'main'
   MAJOR_VERSION: '4'
@@ -16,6 +12,7 @@ env:
 jobs:
   check-ruby-setup:
     runs-on: ubuntu-latest
+
     outputs:
       TARGET_RUBY_VERSION: ${{ steps.check-ruby.outputs.TARGET_RUBY_VERSION }}
       NEW_RUBY: ${{ steps.check-ruby.outputs.NEW_RUBY }}
@@ -41,6 +38,10 @@ jobs:
 
   upgrade-ruby:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
     needs: [check-ruby-setup]
     steps:
 
