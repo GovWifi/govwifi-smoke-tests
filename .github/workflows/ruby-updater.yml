@@ -7,7 +7,7 @@ on:
 
 env:
   MAIN_BRANCH: 'main'
-  MAJOR_VERSION: '4'
+  MAJOR_VERSION: 4
 
 jobs:
   check-ruby-setup:
