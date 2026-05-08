@@ -22,19 +22,19 @@ jobs:
     steps:
 
     - name: Check out code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
     - name: Check Ruby Version
       id: check-ruby
-      uses: govwifi/shared-actions-workflows/.github/actions/ruby-version-check@main
+      uses: govwifi/shared-actions-workflows/.github/actions/ruby-version-check@bug_fixes
       with:
         major-version: ${{ env.MAJOR_VERSION }}
 
     - name: Setup github branch for Ruby Updates
       id: setup-branch
       if: ${{ steps.check-ruby.outputs.NEW_RUBY == 'true' }}
-      uses: govwifi/shared-actions-workflows/.github/actions/ruby-setup-branch@main
+      uses: govwifi/shared-actions-workflows/.github/actions/ruby-setup-branch@bug_fixes
       env:
         TARGET_RUBY_VERSION: ${{ steps.check-ruby.outputs.TARGET_RUBY_VERSION }}
 
@@ -48,7 +48,7 @@ jobs:
     steps:
 
     - name: Check out code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -60,14 +60,14 @@ jobs:
          RUBY_PATHS: ${{ needs.check-ruby-setup.outputs.RUBY_PATHS}}
       ## Only update if the Ruby Version has changed.
       if: ${{ env.NEW_RUBY == 'true' }}
-      uses: govwifi/shared-actions-workflows/.github/actions/ruby-updater-multi-env@main
+      uses: govwifi/shared-actions-workflows/.github/actions/ruby-updater-multi-env@bug_fixes
 
     - name: Commit and Raise PR
       env:
          TARGET_RUBY_VERSION: ${{ needs.check-ruby-setup.outputs.TARGET_RUBY_VERSION }}
          COMMIT_BRANCH: ${{ needs.check-ruby-setup.outputs.COMMIT_BRANCH }}
          NEW_RUBY: ${{ needs.check-ruby-setup.outputs.NEW_RUBY}}
-      uses: govwifi/shared-actions-workflows/.github/actions/ruby-commit-changes@main
+      uses: govwifi/shared-actions-workflows/.github/actions/ruby-commit-changes@bug_fixes
       ## Only update if the Ruby Version has changed.
       if: ${{ env.NEW_RUBY == 'true' }}
       with:
