@@ -25,16 +25,19 @@ jobs:
       uses: actions/checkout@v6
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Check Ruby Version
       id: check-ruby
-      uses: govwifi/shared-actions-workflows/.github/actions/ruby-version-check@bug_fixes
+      uses: govwifi/shared-actions-workflows/.github/actions/ruby-version-check@main
       with:
         major-version: ${{ env.MAJOR_VERSION }}
+      ## This step will check the current Ruby version against the latest available version for the specified major version. It will set outputs TARGET_RUBY_VERSION, NEW_RUBY, and RUBY_PATHS.
 
     - name: Setup github branch for Ruby Updates
       id: setup-branch
+      ## Only run if the Ruby Version has changed.
       if: ${{ steps.check-ruby.outputs.NEW_RUBY == 'true' }}
-      uses: govwifi/shared-actions-workflows/.github/actions/ruby-setup-branch@bug_fixes
+      uses: govwifi/shared-actions-workflows/.github/actions/ruby-setup-branch@main
       env:
         TARGET_RUBY_VERSION: ${{ steps.check-ruby.outputs.TARGET_RUBY_VERSION }}
 
@@ -60,14 +63,14 @@ jobs:
          RUBY_PATHS: ${{ needs.check-ruby-setup.outputs.RUBY_PATHS}}
       ## Only update if the Ruby Version has changed.
       if: ${{ env.NEW_RUBY == 'true' }}
-      uses: govwifi/shared-actions-workflows/.github/actions/ruby-updater-multi-env@bug_fixes
+      uses: govwifi/shared-actions-workflows/.github/actions/ruby-updater-multi-env@main
 
     - name: Commit and Raise PR
       env:
          TARGET_RUBY_VERSION: ${{ needs.check-ruby-setup.outputs.TARGET_RUBY_VERSION }}
          COMMIT_BRANCH: ${{ needs.check-ruby-setup.outputs.COMMIT_BRANCH }}
          NEW_RUBY: ${{ needs.check-ruby-setup.outputs.NEW_RUBY}}
-      uses: govwifi/shared-actions-workflows/.github/actions/ruby-commit-changes@bug_fixes
+      uses: govwifi/shared-actions-workflows/.github/actions/ruby-commit-changes@main
       ## Only update if the Ruby Version has changed.
       if: ${{ env.NEW_RUBY == 'true' }}
       with:
