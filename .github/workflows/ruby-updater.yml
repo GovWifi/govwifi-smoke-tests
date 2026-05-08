@@ -3,7 +3,7 @@ name: Upgrade Ruby
 on:
   workflow_dispatch:
   schedule:
-    - cron: "25 2 15 * 0" # Runs monthly (in the middle to avoid any date clashes)
+    - cron: "25 2 15 * *" # Runs monthly (in the middle to avoid any date clashes)
 
 env:
   MAIN_BRANCH: 'main'
