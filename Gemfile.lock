@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/GovWifi/govwifi_eapoltest.git
-  revision: 98deaf6d2d4e127ee1198506c1b64de093954b5e
+  revision: 860007cc36c5865d25054a32c2424b61bd013d26
   specs:
-    govwifi_eapoltest (0.2.1)
+    govwifi_eapoltest (0.2.2)
       base64 (>= 0.3.0)
       benchmark (>= 0.5.0)
       ostruct (>= 0.6.3)
